@@ -1,0 +1,1 @@
+{'bsz': 4, 'continue_training': False, 'delimiter': True, 'dropout': 0, 'enc_type': 'organics', 'fload': None, 'gclip': 15, 'gpu': -1, 'hdim': 50, 'idim': 8, 'lr': 0.001, 'max_len': 4, 'min_len': 1, 'nbatch_train': 10000, 'nbatch_valid': 1000, 'nepoch': 100, 'odim': 7, 'optim': 'rmsprop', 'patience': 10000, 'seed': 1000, 'sub_task': 'overall', 'task': 'repeat', 'valid_times': 4}

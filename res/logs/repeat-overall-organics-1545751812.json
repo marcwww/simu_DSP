@@ -1,0 +1,9 @@
+{'bsz': 4, 'continue_training': False, 'delimiter': True, 'dropout': 0, 'enc_type': 'organics', 'fload': None, 'gclip': 15, 'gpu': -1, 'hdim': 100, 'idim': 8, 'lr': 0.001, 'max_len': 4, 'min_len': 1, 'nbatch_train': 10000, 'nbatch_valid': 1000, 'nepoch': 100, 'odim': 7, 'optim': 'rmsprop', 'patience': 10000, 'seed': 1000, 'sub_task': 'overall', 'task': 'repeat', 'valid_times': 4}
+{"Epoch": 0, "Format": "a/l", "Metrics": [0.0, 0.3021]}
+{"Epoch": 0, "Format": "a/l", "Metrics": [0.0, 0.0699]}
+{"Epoch": 0, "Format": "a/l", "Metrics": [0.0, 0.0188]}
+{"Epoch": 0, "Format": "a/l", "Metrics": [0.0, 0.0122]}
+{"Epoch": 1, "Format": "a/l", "Metrics": [0.0, 0.0101]}
+{"Epoch": 1, "Format": "a/l", "Metrics": [0.0, 0.0083]}
+{"Epoch": 1, "Format": "a/l", "Metrics": [0.0, 0.0074]}
+{"Epoch": 1, "Format": "a/l", "Metrics": [0.0, 0.0068]}

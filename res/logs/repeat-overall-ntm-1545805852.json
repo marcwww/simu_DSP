@@ -1,0 +1,25 @@
+{'M': 20, 'N': 20, 'bsz': 2, 'continue_training': False, 'delimiter': True, 'dropout': 0, 'enc_type': 'ntm', 'fload': None, 'gclip': 15, 'gpu': -1, 'hdim': 100, 'idim': 9, 'lr': 0.001, 'max_len': 5, 'min_len': 1, 'nbatch_train': 10000, 'nbatch_valid': 100, 'nepoch': 100, 'odim': 8, 'optim': 'rmsprop', 'patience': 10000, 'read_first': True, 'seed': 1000, 'sub_task': 'overall', 'task': 'repeat', 'valid_times': 4}
+{"Epoch": 0, "Format": "a/l", "Metrics": [0.0, 0.382]}
+{"Epoch": 0, "Format": "a/l", "Metrics": [0.165, 0.1667]}
+{"Epoch": 0, "Format": "a/l", "Metrics": [0.595, 0.0097]}
+{"Epoch": 0, "Format": "a/l", "Metrics": [0.95, 0.002]}
+{"Epoch": 1, "Format": "a/l", "Metrics": [0.965, 0.0033]}
+{"Epoch": 1, "Format": "a/l", "Metrics": [0.935, 0.0022]}
+{"Epoch": 1, "Format": "a/l", "Metrics": [0.98, 0.0009]}
+{"Epoch": 1, "Format": "a/l", "Metrics": [0.995, 0.0042]}
+{"Epoch": 2, "Format": "a/l", "Metrics": [0.975, 0.0004]}
+{"Epoch": 2, "Format": "a/l", "Metrics": [0.94, 0.002]}
+{"Epoch": 2, "Format": "a/l", "Metrics": [0.945, 0.0001]}
+{"Epoch": 2, "Format": "a/l", "Metrics": [0.995, 0.0001]}
+{"Epoch": 3, "Format": "a/l", "Metrics": [0.975, 0.0012]}
+{"Epoch": 3, "Format": "a/l", "Metrics": [0.995, 0.0001]}
+{"Epoch": 3, "Format": "a/l", "Metrics": [0.985, 0.0013]}
+{"Epoch": 3, "Format": "a/l", "Metrics": [0.945, 0.0024]}
+{"Epoch": 4, "Format": "a/l", "Metrics": [0.98, 0.0019]}
+{"Epoch": 4, "Format": "a/l", "Metrics": [0.985, 0.0001]}
+{"Epoch": 4, "Format": "a/l", "Metrics": [0.99, 0.0001]}
+{"Epoch": 4, "Format": "a/l", "Metrics": [0.99, 0.0001]}
+{"Epoch": 5, "Format": "a/l", "Metrics": [0.99, 0.001]}
+{"Epoch": 5, "Format": "a/l", "Metrics": [1.0, 0.0005]}
+{"Epoch": 5, "Format": "a/l", "Metrics": [0.99, 0.0023]}
+{"Epoch": 5, "Format": "a/l", "Metrics": [0.97, 0.0023]}
