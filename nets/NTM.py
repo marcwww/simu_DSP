@@ -165,9 +165,10 @@ class EncoderNTM(MARNNBaseEncoder):
             assert 'fntm' in dir(self)
             assert self.rstate.shape[0] == 1
             line = {'type': 'read',
-                    'w': self.rstate[0].cpu().numpy().tolist()}
+                    'w': self.rstate[0].cpu().numpy().tolist(),
+                    'mem': self.mem.memory[0].cpu().numpy().tolist()}
             line = json.dumps(line)
-            print(line)
+            # print(line)
             print(line, file=self.fntm)
 
         return r
@@ -179,9 +180,10 @@ class EncoderNTM(MARNNBaseEncoder):
             assert 'fntm' in dir(self)
             assert self.rstate.shape[0] == 1
             line = {'type': 'write',
-                    'w': self.wstate[0].cpu().numpy().tolist()}
+                    'w': self.wstate[0].cpu().numpy().tolist(),
+                    'mem': self.mem.memory[0].cpu().numpy().tolist()}
             line = json.dumps(line)
-            print(line)
+            # print(line)
             print(line, file=self.fntm)
 
 

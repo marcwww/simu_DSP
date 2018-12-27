@@ -14,28 +14,51 @@ import copy
 from sklearn.metrics import accuracy_score, \
     precision_score, recall_score, f1_score
 
-def gen_batch(opt):
+def gen_batch(min_len, max_len, bsz, idim):
 
-    min_len = opt.min_len
-    max_len = opt.max_len
-    bsz = opt.bsz
-    width = opt.idim
-    delimiter = opt.delimiter
+    min_len = min_len
+    max_len = max_len
+    bsz = bsz
+    assert idim > 2
+    width = idim - 1
 
     seq_len = random.randint(min_len, max_len)
-    if delimiter:
-        assert width > 1
 
-        seq = np.random.binomial(1, 0.5, (seq_len, bsz, width - 1))
-        seq = torch.Tensor(seq)
-        inp = torch.zeros(seq_len + 1, bsz, width)
-        inp[:seq_len, :, :width-1] = seq
-        inp[seq_len, :, width-1] = 1.0  # delimiter in our control channel
+    seq = np.random.binomial(1, 0.5, (seq_len, bsz, width))
+    seq = torch.Tensor(seq)
+    inp = torch.zeros(seq_len + 1, bsz, width + 1)
+    inp[:seq_len, :, :width] = seq
+    inp[seq_len, :, width] = 1.0  # delimiter in our control channel
 
-    else:
-        seq = np.random.binomial(1, 0.5, (seq_len, bsz, width))
-        seq = torch.Tensor(seq)
-        inp = seq
+    outp = seq.clone()
+
+    return inp.float(), outp.float()
+
+def gen_batch_train(opt):
+    return gen_batch(opt.min_len_train, opt.max_len_train, opt.bsz, opt.idim)
+
+def gen_batch_valid(opt):
+    return gen_batch(opt.min_len_valid, opt.max_len_valid, opt.bsz, opt.idim)
+
+def gen_batch_analy(opt):
+
+    seq_len = 8
+    bsz = 1
+    idim = opt.idim
+    assert idim > 2
+    width = idim - 1
+
+    NUMS = list(range(1, 9+1))
+
+    seq = []
+    for _ in range(seq_len):
+        numeral = random.choice(NUMS)
+        bivec = utils.bin_vec(numeral, width)
+        seq.append(bivec)
+    seq = torch.Tensor(seq).unsqueeze(1)
+    inp = torch.zeros(seq_len + 1, bsz, width + 1)
+    inp[:seq_len, :, :width] = seq
+    inp[seq_len, :, width] = 1.0  # delimiter in our control channel
 
     outp = seq.clone()
 
@@ -70,6 +93,41 @@ def mdl_save(model, basename):
     save_path = os.path.join(MDLS, model_fname)
     print('Saving to ' + save_path)
     torch.save(model.state_dict(), save_path)
+
+def analy(**kwargs):
+    model = kwargs['model']
+    diter_analy = kwargs['diter_analy']
+    enc_type = kwargs['enc_type']
+    fanalysis = getattr(model.encoder, 'f' + enc_type)
+
+    nc = 0
+    nt = 0
+
+    with torch.no_grad():
+        model.eval()
+        for i, (inp, tar) in enumerate(diter_analy):
+            tlen, bsz, _ = tar.shape
+            assert bsz == 1
+            out = model(inp, tlen)
+            out_binarized = out.data.gt(0.5).float()
+
+            cost = torch.abs(out_binarized - tar).sum(dim=0).sum(dim=-1)
+            nc += cost.eq(0).sum().item()
+            nt += bsz
+
+            is_correct = 1 if (cost == 0) else 0
+            seq_inp = [str(utils.bivec_tensor2int(num_vec)) for num_vec in inp[:, 0, :-1]]
+            seq_tar = [str(utils.bivec_tensor2int(num_vec)) for num_vec in tar[:, 0]]
+            line = {'type': 'input',
+                    'idx': i,
+                    'inp': seq_inp,
+                    'tar': seq_tar,
+                    'is_correct': is_correct}
+            line = json.dumps(line)
+            print(line)
+            print(line, file=fanalysis)
+
+    return nc / nt
 
 def valid(**kwargs):
     model = kwargs['model']

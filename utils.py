@@ -143,3 +143,32 @@ def modulo_convolve(w, s):
     # c: (bsz, N)
     c = F.conv1d(t, kernel).squeeze(0)
     return c
+
+def bin_vec(num, dim):
+    assert type(num) == int
+    bin_str = bin(num)[2:]
+    assert len(bin_str) < dim
+    bin_lst = [0] * (dim - len(bin_str)) + list(map(int, bin_str))
+    bin_arr = np.array(bin_lst)
+    return bin_arr
+
+def bivec_tensor2int(bivec):
+    res = int(''.join(list(map(str, list(bivec.int().numpy())))), 2)
+    return res
+
+class analy(object):
+
+    def __init__(self, model, fnames_dict):
+        self.model = model
+        self.fnames_dict = fnames_dict
+
+    def __enter__(self):
+        self.model.analysis_mode = True
+        for name in self.fnames_dict:
+            setattr(self.model, name, open(self.fnames_dict[name], 'w'))
+
+    def __exit__(self, *args):
+        self.model.analysis_mode = False
+        for name in self.fnames_dict:
+            f = getattr(self.model, name)
+            f.close()

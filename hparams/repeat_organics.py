@@ -4,10 +4,7 @@ def model_opts(parser):
     group = parser.add_argument_group('model')
     group.add_argument('-idim', type=int, default=8)
     group.add_argument('-hdim', type=int, default=100)
-    group.add_argument('--delimiter',
-                       action='store_true', default=True)
-    # if using delimiter, the odim = idim - 1
-    group.add_argument('-odim', type=int, default=8-1)
+    group.add_argument('-odim', type=int, default=8)
     group.add_argument('-dropout', type=float, default=0)
 
 def train_opts(parser):
@@ -20,7 +17,9 @@ def train_opts(parser):
     group.add_argument('-fload', type=str, default=None)
     group.add_argument('-bsz', type=int, default=4)
     group.add_argument('-lr', type=float, default=1e-3)
-    group.add_argument('-min_len', type=int, default=1)
-    group.add_argument('-max_len', type=int, default=4)
+    group.add_argument('-min_len_train', type=int, default=1)
+    group.add_argument('-max_len_train', type=int, default=5)
+    group.add_argument('-min_len_valid', type=int, default=6)
+    group.add_argument('-max_len_valid', type=int, default=10)
     group.add_argument('-patience', type=int, default=10000)
     group.add_argument('-gclip', type=int, default=15)
