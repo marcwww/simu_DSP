@@ -30,7 +30,7 @@ def gen_batch(min_len, max_len, bsz, idim):
     inp[:seq_len, :, :width] = seq
     inp[seq_len, :, width] = 1.0  # delimiter in our control channel
 
-    outp = seq.clone()
+    outp = seq[range(seq_len - 1, -1, -1)].clone()
 
     return inp.float(), outp.float()
 
@@ -60,7 +60,7 @@ def gen_batch_analy(opt):
     inp[:seq_len, :, :width] = seq
     inp[seq_len, :, width] = 1.0  # delimiter in our control channel
 
-    outp = seq.clone()
+    outp = seq[range(seq_len - 1, -1, -1)].clone()
 
     return inp.float(), outp.float()
 
@@ -76,7 +76,10 @@ def log_init(opt):
 
     return log_path, basename
 
-def log_print(log_path, log_str, optim):
+def log_print(log_path, epoch, acc, loss_ave, optim):
+    log_str = {'Epoch': epoch,
+               'Format':'a/l',
+               'Metrics': [round(acc, 4), round(loss_ave, 4)]}
     log_str = json.dumps(log_str)
     print(log_str)
     with open(log_path, 'a+') as f:
@@ -126,26 +129,6 @@ def analy(**kwargs):
 
     return nc / nt
 
-def valid_along(**kwargs):
-    model = kwargs['model']
-    diter_valid = kwargs['diter_valid_along']
-
-    nc = 0
-    nt = 0
-
-    with torch.no_grad():
-        model.eval()
-        for inp, tar in diter_valid:
-            tlen, bsz, _ = tar.shape
-            # out: (seq_len, bsz, odim)
-            out = model(inp, tlen)
-            out_binarized = out.data.gt(0.5).float()
-
-            nc += torch.abs(out_binarized - tar).sum(dim=-1).eq(0).sum(dim=1)
-            nt += bsz
-
-    return (nc.float() / nt).cpu().numpy().tolist()
-
 def valid(**kwargs):
     model = kwargs['model']
     diter_valid = kwargs['diter_valid']
@@ -179,7 +162,6 @@ def train(**kwargs):
 
     best_perform = -1
     losses = []
-    gnorms = []
     for epoch in range(opt.nepoch):
         for i, (inp, tar) in enumerate(diter_train):
             model.train()
@@ -191,8 +173,7 @@ def train(**kwargs):
             losses.append(loss.item())
 
             loss.backward()
-            gnorm = clip_grad_norm_(model.parameters(), opt.gclip)
-            gnorms.append(gnorm)
+            clip_grad_norm_(model.parameters(), opt.gclip)
             optim.step()
 
             loss = {'loss': loss.item()}
@@ -201,20 +182,10 @@ def train(**kwargs):
 
             if (i + 1) % (len(diter_train) // opt.valid_times) == 0:
                 loss_ave = np.mean(losses)
-                gnorm_ave = np.mean(gnorms)
                 losses = []
-                gnorms = []
                 acc = valid(model=model, diter_valid=diter_valid)
-                log_str = {'Epoch': epoch,
-                           'acc': round(acc, 4),
-                           'loss': round(float(loss_ave), 4),
-                           'gnorm': round(float(gnorm_ave), 4)}
 
-                if opt.min_len_valid == opt.max_len_valid:
-                    acc_along = valid_along(model=model, diter_valid_along=diter_valid)
-                    log_str['acc_along'] = list(map(lambda x: round(float(x), 4), acc_along))
-
-                log_print(log_path, log_str, optim)
+                log_print(log_path, epoch, acc, loss_ave, optim)
                 scheduler.step(loss_ave)
 
                 if acc >= best_perform:
