@@ -14,8 +14,8 @@ import copy
 from sklearn.metrics import accuracy_score, \
     precision_score, recall_score, f1_score
 
-def gen_batch(min_len, max_len, bsz, idim):
 
+def gen_batch(min_len, max_len, bsz, idim):
     min_len = min_len
     max_len = max_len
     bsz = bsz
@@ -34,21 +34,23 @@ def gen_batch(min_len, max_len, bsz, idim):
 
     return inp.float(), outp.float()
 
+
 def gen_batch_train(opt):
     return gen_batch(opt.min_len_train, opt.max_len_train, opt.bsz, opt.idim)
+
 
 def gen_batch_valid(opt):
     return gen_batch(opt.min_len_valid, opt.max_len_valid, opt.bsz, opt.idim)
 
-def gen_batch_analy(opt):
 
+def gen_batch_analy(opt):
     seq_len = 4
     bsz = 1
     idim = opt.idim
     assert idim > 2
     width = idim - 1
 
-    NUMS = list(range(1, 9+1))
+    NUMS = list(range(1, 9 + 1))
 
     seq = []
     for _ in range(seq_len):
@@ -64,17 +66,49 @@ def gen_batch_analy(opt):
 
     return inp.float(), outp.float()
 
+
+def gen_batch_pattern(opt):
+    NUMS = list(range(0, 6))
+    seq_len = 4
+    bsz = 1
+    idim = opt.idim
+    width = idim - 1
+
+    seq = []
+    numeral = random.choice(NUMS)
+    pattern = opt.pattern
+    assert len(pattern) == 3
+    pattern = list(map(int, pattern))
+    delta = pattern + [-1]
+
+    for i in range(4):
+        bivec = utils.bin_vec(numeral, width)
+        seq.append(bivec)
+        numeral += delta[i]
+        numeral %= 6
+
+    seq = torch.Tensor(seq).unsqueeze(1)
+    inp = torch.zeros(seq_len + 1, bsz, width + 1)
+    inp[:seq_len, :, :width] = seq
+    inp[seq_len, :, width] = 1.0  # delimiter in our control channel
+
+    outp = seq.clone()
+
+    return inp.float(), outp.float()
+
+
 def log_init(opt):
     basename = "{}-{}-{}-{}".format(opt.task,
-                                opt.sub_task,
-                                opt.enc_type,
-                                utils.time_int())
+                                    opt.sub_task,
+                                    opt.enc_type,
+                                    utils.time_int())
     log_fname = basename + ".json"
     log_path = os.path.join(LOGS, log_fname)
     with open(log_path, 'w') as f:
         f.write(str(utils.param_str(opt)) + '\n')
 
     return log_path, basename
+
 
 def log_print(log_path, log_str, optim):
     log_str = json.dumps(log_str)
@@ -85,11 +119,13 @@ def log_print(log_path, log_str, optim):
     for param_group in optim.param_groups:
         print('learning rate:', param_group['lr'])
 
+
 def mdl_save(model, basename):
     model_fname = basename + ".model"
     save_path = os.path.join(MDLS, model_fname)
     print('Saving to ' + save_path)
     torch.save(model.state_dict(), save_path)
+
 
 def analy(**kwargs):
     model = kwargs['model']
@@ -126,6 +162,7 @@ def analy(**kwargs):
 
     return nc / nt
 
+
 def valid_along(**kwargs):
     model = kwargs['model']
     diter_valid = kwargs['diter_valid_along']
@@ -146,6 +183,7 @@ def valid_along(**kwargs):
 
     return (nc.float() / nt).cpu().numpy().tolist()
 
+
 def valid(**kwargs):
     model = kwargs['model']
     diter_valid = kwargs['diter_valid']
@@ -160,11 +198,12 @@ def valid(**kwargs):
             out = model(inp, tlen)
             out_binarized = out.data.gt(0.5).float()
 
-            cost = torch.abs(out_binarized-tar).sum(dim=0).sum(dim=-1)
+            cost = torch.abs(out_binarized - tar).sum(dim=0).sum(dim=-1)
             nc += cost.eq(0).sum()
             nt += bsz
 
-    return nc.item()/nt
+    return nc.item() / nt
+
 
 def train(**kwargs):
     opt = kwargs['opt']
@@ -221,6 +260,7 @@ def train(**kwargs):
                     best_perform = acc
                     mdl_save(model, basename)
 
+
 class Model(nn.Module):
 
     def __init__(self, encoder, odim):
@@ -238,14 +278,3 @@ class Model(nn.Module):
         probs = self.clf(out)
 
         return probs[ilen:]
-
-
-
-
-
-
-
-
-
-
-

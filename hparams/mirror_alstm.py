@@ -8,7 +8,6 @@ def model_opts(parser):
     group.add_argument('-odim', type=int, default=9 - 1)
     # group.add_argument('-N', type=int, default=4)
     group.add_argument('-N', type=int, default=20)
-    # group.add_argument('-N', type=int, default=3)
     group.add_argument('-M', type=int, default=20)
     group.add_argument('-dropout', type=float, default=0)
     group.add_argument('--read_first',
@@ -21,8 +20,8 @@ def train_opts(parser):
     group.add_argument('-nepoch', type=int, default=100)
     group.add_argument('-nbatch_train', type=int, default=10000)
     group.add_argument('-nbatch_valid', type=int, default=100)
-    group.add_argument('-valid_times', type=int, default=10)
-    group.add_argument('-fload', type=str, default='repeat-overall-ntm-1547024845.model')
+    group.add_argument('-valid_times', type=int, default=4)
+    group.add_argument('-fload', type=str, default='mirror-overall-ntm-1545920733.model')
     group.add_argument('-bsz', type=int, default=2)
     group.add_argument('-lr', type=float, default=1e-3)
     group.add_argument('-min_len_train', type=int, default=1)

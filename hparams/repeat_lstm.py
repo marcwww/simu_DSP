@@ -13,7 +13,7 @@ def train_opts(parser):
     group.add_argument('-nepoch', type=int, default=100)
     group.add_argument('-nbatch_train', type=int, default=10000)
     group.add_argument('-nbatch_valid', type=int, default=1000)
-    group.add_argument('-valid_times', type=int, default=4)
+    group.add_argument('-valid_times', type=int, default=10)
     group.add_argument('-fload', type=str, default=None)
     group.add_argument('-bsz', type=int, default=4)
     group.add_argument('-lr', type=float, default=1e-3)

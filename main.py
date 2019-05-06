@@ -13,8 +13,8 @@ import sys
 import crash_on_ipy
 import copy
 
-def select_task(opt):
 
+def select_task(opt):
     gen_batch = None
 
     if opt.task == 'repeat':
@@ -36,8 +36,8 @@ def select_task(opt):
 
     return gen_batch, train, Model, diter_train, diter_valid
 
-def select_encoder(opt):
 
+def select_encoder(opt):
     if opt.enc_type == 'lstm':
         encoder = nets.EncoderLSTM(opt.idim, opt.hdim, opt.dropout)
     elif opt.enc_type == 'organics':
@@ -48,23 +48,28 @@ def select_encoder(opt):
         encoder = nets.EncoderNTMnos(opt.idim, opt.hdim, opt.N, opt.M, opt.dropout, opt.read_first)
     elif opt.enc_type == 'ntmr':
         encoder = nets.EncoderNTMr(opt.idim, opt.hdim, opt.N, opt.M, opt.dropout, opt.read_first)
+    elif opt.enc_type == 'sarnn':
+        encoder = nets.EncoderSARNN(opt.idim, opt.hdim, opt.N, opt.M, opt.dropout, opt.read_first)
+    elif opt.enc_type == 'alstm':
+        encoder = nets.EncoderALSTM(opt.idim, opt.hdim, opt.N, opt.M, opt.dropout, opt.read_first)
     else:
         raise ModuleNotFoundError
 
     return encoder
 
-def select_optim(opt, model):
 
+def select_optim(opt, model):
     if opt.optim == 'rmsprop':
         optimizer = optim.RMSprop(params=filter(lambda p: p.requires_grad, model.parameters()),
                                   lr=opt.lr)
     elif opt.optim == 'adam':
         optimizer = optim.Adam(params=filter(lambda p: p.requires_grad, model.parameters()),
-                                  lr=opt.lr)
+                               lr=opt.lr)
     else:
         raise ModuleNotFoundError
 
     return optimizer
+
 
 if __name__ == '__main__':
 
@@ -88,7 +93,7 @@ if __name__ == '__main__':
                                   mode='min',
                                   factor=0.1,
                                   patience=opt.patience,
-                                  min_lr=opt.lr/10)
+                                  min_lr=opt.lr / 10)
 
     train(opt=opt,
           model=model,

@@ -12,25 +12,21 @@ from torch.nn.init import orthogonal_, uniform_, xavier_uniform_
 import sys
 import crash_on_ipy
 import copy
-import visualization
 
 def select_task(opt):
 
     gen_batch = None
-    analy = None
-    Model = None
-    diter_analy = None
     valid_along = None
+    Model = None
+    diter_valid_along = None
 
     if opt.task == 'repeat':
-        # gen_batch_analy = repeat.gen_batch_analy
         gen_batch_analy = repeat.gen_batch_pattern
         valid_along = repeat.valid_along
-        analy = repeat.analy
         Model = repeat.Model
-        diter_analy = utils.DataIter(opt, 500, gen_batch_analy)
+        diter_valid_along = utils.DataIter(opt, 500, gen_batch_analy)
 
-    return gen_batch, valid_along, analy, Model, diter_analy
+    return gen_batch, valid_along, Model, diter_valid_along
 
 def select_encoder(opt):
 
@@ -78,7 +74,7 @@ if __name__ == '__main__':
 
     utils.init_seed(opt.seed)
 
-    gen_batch, valid_along, analy, Model, diter_analy = select_task(opt)
+    gen_batch, valid_along, Model, diter_valid_along = select_task(opt)
     encoder = select_encoder(opt)
     model = Model(encoder, opt.odim)
     utils.init_model(model, xavier_uniform_)
@@ -89,30 +85,7 @@ if __name__ == '__main__':
     for key, val in param_str.items():
         print(str(key) + ': ' + str(val))
 
-    scheduler = ReduceLROnPlateau(optimizer,
-                                  mode='min',
-                                  factor=0.1,
-                                  patience=opt.patience,
-                                  min_lr=opt.lr/10)
-
-    fname_dict = {}
-    fanaly_name = 'memcontent'
-
-    fenc = os.path.join('..', os.path.join(ANAs, '%s-%s-%s-%d.txt' % (opt.task, fanaly_name, opt.enc_type, utils.time_int())))
-    fname_dict['f' + opt.enc_type] = fenc
-    flstm = os.path.join('..', os.path.join(ANAs, '%s-%s-%s_lstm-%d.txt' % (opt.task, fanaly_name, opt.enc_type, utils.time_int())))
-    fname_dict['flstm'] = flstm
-
-    with utils.analy(model.encoder, fname_dict):
-        acc = analy(model=model, diter_analy=diter_analy, enc_type='ntmnos')
-
-    visualization.policy(inp_len=4+1, N=3, fname_ntm=fenc, title=opt.pattern)
-
-    print('Accuracy whole:', acc)
-
-    acc = valid_along(model=model, diter_valid_along=diter_analy)
+    acc = valid_along(model=model, diter_valid_along=diter_valid_along)
     acc = list(map(lambda x: round(x, 3), acc))
 
-    print('Accuracy along:', acc)
-
-    print('Saved to', fname_dict)
+    print('Accuracy', acc)

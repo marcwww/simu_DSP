@@ -1,15 +1,17 @@
 from macros import *
 from . import repeat_lstm, repeat_organics, repeat_ntm, \
-    mirror_ntm, repeat_ntmnos, repeat_ntmr, mirror_ntmr
+    repeat_sarnn, repeat_alstm, \
+    mirror_ntm, repeat_ntmnos, repeat_ntmr, mirror_ntmr, \
+    mirror_sarnn, mirror_alstm
 
 
 def general_opts(parser):
     group = parser.add_argument_group('general')
     # group.add_argument('-enc_type', type=str, default='lstm')
     # group.add_argument('-enc_type', type=str, default='organics')
-    # group.add_argument('-enc_type', type=str, default='ntm')
+    group.add_argument('-enc_type', type=str, default='ntm')
     # group.add_argument('-enc_type', type=str, default='ntmnos')
-    group.add_argument('-enc_type', type=str, default='ntmr')
+    # group.add_argument('-enc_type', type=str, default='ntmr')
 
     group.add_argument('-task', type=str, default='repeat')
     # group.add_argument('-task', type=str, default='mirror')
@@ -19,8 +21,8 @@ def general_opts(parser):
     group.add_argument('--continue_training',
                        action='store_true', default=False)
 
-def select_opt(task, enc_type, parser):
 
+def select_opt(task, enc_type, parser):
     if task == 'repeat' and enc_type == 'lstm':
         repeat_lstm.model_opts(parser)
         repeat_lstm.train_opts(parser)
@@ -36,12 +38,24 @@ def select_opt(task, enc_type, parser):
     elif task == 'repeat' and enc_type == 'ntmr':
         repeat_ntmr.model_opts(parser)
         repeat_ntmr.train_opts(parser)
+    elif task == 'repeat' and enc_type == 'sarnn':
+        repeat_sarnn.model_opts(parser)
+        repeat_sarnn.train_opts(parser)
+    elif task == 'repeat' and enc_type == 'alstm':
+        repeat_alstm.model_opts(parser)
+        repeat_alstm.train_opts(parser)
     elif task == 'mirror' and enc_type == 'ntmr':
         mirror_ntmr.model_opts(parser)
         mirror_ntmr.train_opts(parser)
     elif task == 'mirror' and enc_type == 'ntm':
         mirror_ntm.model_opts(parser)
         mirror_ntm.train_opts(parser)
+    elif task == 'mirror' and enc_type == 'sarnn':
+        mirror_sarnn.model_opts(parser)
+        mirror_sarnn.train_opts(parser)
+    elif task == 'mirror' and enc_type == 'alstm':
+        mirror_alstm.model_opts(parser)
+        mirror_alstm.train_opts(parser)
     else:
         raise ModuleNotFoundError
 

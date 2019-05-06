@@ -4,6 +4,7 @@ import torch
 from torch.nn import functional as F
 import json
 
+
 class EncoderLSTM(nn.Module):
 
     def __init__(self, idim, cdim, drop):
@@ -66,12 +67,12 @@ class EncoderLSTM(nn.Module):
             if 'analysis_mode' in dir(self) and self.analysis_mode:
                 assert 'flstm' in dir(self)
                 i, f, g, o, c_new, h_new = _calc_gates(self, emb.unsqueeze(0), h, c)
-                line = {'type':'gates',
+                line = {'type': 'gates',
                         't': t,
-                        'i':i.cpu().numpy().tolist(),
-                        'f':f.cpu().numpy().tolist(),
-                        'g':g.cpu().numpy().tolist(),
-                        'o':o.cpu().numpy().tolist()}
+                        'i': i.cpu().numpy().tolist(),
+                        'f': f.cpu().numpy().tolist(),
+                        'g': g.cpu().numpy().tolist(),
+                        'o': o.cpu().numpy().tolist()}
                 line = json.dumps(line)
                 print(line, file=self.flstm)
 

@@ -10,6 +10,7 @@ from torch.nn.utils.rnn import pack_padded_sequence as pack, \
 from .MARNN import MARNNBaseEncoder
 import time
 
+
 class NTMMemory(nn.Module):
 
     def __init__(self, N, M):
@@ -38,10 +39,10 @@ class NTMMemory(nn.Module):
         self.memory = self.pre_mem * (1 - erase) + add
 
     def _similarity(self, k, beta):
-        k = k.view(self.bsz, 1 ,-1)
+        k = k.view(self.bsz, 1, -1)
         w = F.softmax(beta *
                       F.cosine_similarity(self.memory + 1e-16,
-                                        k + 1e-16, dim=-1),
+                                          k + 1e-16, dim=-1),
                       dim=1)
         return w
 
@@ -81,6 +82,7 @@ class NTMMemory(nn.Module):
         w = self._sharpen(ww, gamma)
         return w
 
+
 class NTMReadHead(nn.Module):
 
     def __init__(self, memory, cdim):
@@ -109,6 +111,7 @@ class NTMReadHead(nn.Module):
         r = self.memory.read(w)
 
         return r, w
+
 
 class NTMWriteHead(nn.Module):
 
@@ -140,6 +143,7 @@ class NTMWriteHead(nn.Module):
 
         self.memory.write(w, e, a)
         return w
+
 
 class EncoderNTM(MARNNBaseEncoder):
 
@@ -185,7 +189,3 @@ class EncoderNTM(MARNNBaseEncoder):
             line = json.dumps(line)
             # print(line)
             print(line, file=self.fntm)
-
-
-
-

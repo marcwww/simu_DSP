@@ -1,6 +1,5 @@
 from macros import *
 
-
 def model_opts(parser):
     group = parser.add_argument_group('model')
     group.add_argument('-idim', type=int, default=9)
@@ -13,7 +12,6 @@ def model_opts(parser):
     group.add_argument('-dropout', type=float, default=0)
     group.add_argument('--read_first',
                        action='store_true', default=True)
-
 
 def train_opts(parser):
     group = parser.add_argument_group('train')

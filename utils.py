@@ -13,6 +13,7 @@ import argparse
 import sys
 from hparams import opts
 
+
 class DataIter(object):
 
     def __init__(self, opt, nbatch, gen_batch):
@@ -45,6 +46,7 @@ class DataIter(object):
         self.bidx += 1
         return inp.to(self.device), outp.to(self.device)
 
+
 def param_str(opt):
     res_str = {}
     for attr in dir(opt):
@@ -52,21 +54,24 @@ def param_str(opt):
             res_str[attr] = getattr(opt, attr)
     return res_str
 
+
 def time_int():
     return int(time.time())
+
 
 def progress_bar(percent, loss, epoch):
     """Prints the progress until the next report."""
 
     fill = int(percent * 40)
     str_disp = "\r[%s%s]: %.2f/epoch %d" % ('=' * fill,
-                                         ' ' * (40 - fill),
-                                         percent,
-                                         epoch)
+                                            ' ' * (40 - fill),
+                                            percent,
+                                            epoch)
     for k, v in loss.items():
         str_disp += ' (%s:%.4f)' % (k, v)
 
     print(str_disp, end='')
+
 
 def parse_opts(description):
     parser = argparse. \
@@ -89,6 +94,7 @@ def parse_opts(description):
 
     return opt
 
+
 def init_seed(seed=None):
     def get_ms():
         """Returns the current time in miliseconds."""
@@ -106,10 +112,12 @@ def init_seed(seed=None):
     if torch.cuda.is_available():
         torch.backends.cudnn.deterministic = True
 
+
 def init_model(model, method):
     for p in model.parameters():
         if p.dim() > 1 and p.requires_grad:
             method(p)
+
 
 def model_loading(opt, model):
     model_fname = opt.fload
@@ -118,6 +126,7 @@ def model_loading(opt, model):
     model_dict = torch.load(model_path, map_location=location)
     model.load_state_dict(model_dict)
     print('Loaded from ' + model_path)
+
 
 def split_cols(mat, lengths):
     """Split a 2D matrix to variable length columns."""
@@ -128,6 +137,7 @@ def split_cols(mat, lengths):
         results += [mat[:, s:e]]
     return results
 
+
 def modulo_convolve(w, s):
     # w: (bsz, N)
     # s: (bsz, 3)
@@ -135,7 +145,7 @@ def modulo_convolve(w, s):
     assert ksz == 3
 
     # t: (1, bsz, 1+N+1)
-    t = torch.cat([w[:,-1:], w, w[:,:1]], dim=-1).\
+    t = torch.cat([w[:, -1:], w, w[:, :1]], dim=-1). \
         unsqueeze(0)
     device = s.device
     kernel = torch.zeros(bsz, bsz, ksz).to(device)
@@ -143,6 +153,7 @@ def modulo_convolve(w, s):
     # c: (bsz, N)
     c = F.conv1d(t, kernel).squeeze(0)
     return c
+
 
 def bin_vec(num, dim):
     assert type(num) == int
@@ -152,9 +163,11 @@ def bin_vec(num, dim):
     bin_arr = np.array(bin_lst)
     return bin_arr
 
+
 def bivec_tensor2int(bivec):
     res = int(''.join(list(map(str, list(bivec.int().numpy())))), 2)
     return res
+
 
 class analy(object):
 
@@ -172,3 +185,25 @@ class analy(object):
         for name in self.fnames_dict:
             f = getattr(self.model, name)
             f.close()
+
+
+class Attention(nn.Module):
+    def __init__(self, cdim, odim):
+        super(Attention, self).__init__()
+        self.c2r = nn.Linear(cdim, odim)
+
+    def forward(self, h, mem):
+        # h: (bsz, hdim)
+        # h_current: (bsz, 1, 1, hdim)
+        h_current = h.unsqueeze(1).unsqueeze(1)
+        # mem: (bsz, len_total, hdim, 1)
+        mem = mem.unsqueeze(-1)
+        # a: (bsz, len_total, 1, 1)
+        a = h_current.matmul(mem)
+        a = F.softmax(a, dim=1)
+        # c: (bsz, len_total, hdim, 1)
+        c = a * mem
+        # c: (bsz, hdim)
+        c = c.sum(1).squeeze(-1)
+        r = self.c2r(c)
+        return r, a[:, :, 0, 0]
