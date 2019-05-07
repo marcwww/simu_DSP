@@ -50,6 +50,8 @@ def select_encoder(opt):
         encoder = nets.EncoderNTMr(opt.idim, opt.hdim, opt.N, opt.M, opt.dropout, opt.read_first)
     elif opt.enc_type == 'sarnn':
         encoder = nets.EncoderSARNN(opt.idim, opt.hdim, opt.N, opt.M, opt.dropout, opt.read_first)
+    elif opt.enc_type == 'sarnnhc':
+        encoder = nets.EncoderSARNNhc(opt.idim, opt.hdim, opt.N, opt.M, opt.dropout, opt.read_first)
     elif opt.enc_type == 'alstm':
         encoder = nets.EncoderALSTM(opt.idim, opt.hdim, opt.N, opt.M, opt.dropout, opt.read_first)
     else:

@@ -2,7 +2,7 @@ from macros import *
 from . import repeat_lstm, repeat_organics, repeat_ntm, \
     repeat_sarnn, repeat_alstm, \
     mirror_ntm, repeat_ntmnos, repeat_ntmr, mirror_ntmr, \
-    mirror_sarnn, mirror_alstm
+    mirror_sarnn, mirror_alstm, mirror_sarnnhc
 
 
 def general_opts(parser):
@@ -53,6 +53,9 @@ def select_opt(task, enc_type, parser):
     elif task == 'mirror' and enc_type == 'sarnn':
         mirror_sarnn.model_opts(parser)
         mirror_sarnn.train_opts(parser)
+    elif task == 'mirror' and enc_type == 'sarnnhc':
+        mirror_sarnnhc.model_opts(parser)
+        mirror_sarnnhc.train_opts(parser)
     elif task == 'mirror' and enc_type == 'alstm':
         mirror_alstm.model_opts(parser)
         mirror_alstm.train_opts(parser)

@@ -10,7 +10,7 @@ from torch.nn.utils.rnn import pack_padded_sequence as pack, \
 import json
 
 
-class EncoderSARNN(MANNBaseEncoder):
+class EncoderSARNNhc(MANNBaseEncoder):
     def __init__(self, args):
         idim = args.idim
         cdim = args.cdim
@@ -19,8 +19,9 @@ class EncoderSARNN(MANNBaseEncoder):
         drop = args.drop
         read_first = args.read_first
         K = args.K
-        super(EncoderSARNN, self).__init__(idim, cdim, N, M, drop, read_first=read_first)
+        super(EncoderSARNNhc, self).__init__(idim, cdim, N, M, drop, read_first=read_first)
 
+        # self.K = 1
         self.K = K
         # self.K = N
         self.mem_bias = nn.Parameter(torch.zeros(M),
@@ -30,7 +31,7 @@ class EncoderSARNN(MANNBaseEncoder):
                                        requires_grad=False)
         self.zero = nn.Parameter(torch.zeros(1, 1, 1),
                                  requires_grad=False)
-        self.policy = nn.Sequential(nn.Linear(idim + M * 2, 3), nn.LogSoftmax(dim=-1))
+        self.policy = nn.Sequential(nn.Linear(cdim + M * 2, 3), nn.LogSoftmax(dim=-1))
         self.hid2pushed = nn.Linear(cdim, M) if cdim != M else lambda x: x
 
     def _inf_bias_policy(self, inp, weight, bias):
@@ -50,8 +51,8 @@ class EncoderSARNN(MANNBaseEncoder):
         # pop_kernel: (N+1, 1, N + 1, 1)
         m_pop = F.conv2d(mem_padded, self.pop_kernel)
         pin_stack = torch.cat([m_pop[:, :, 0], m_pop[:, :, 1]], dim=2)  # pin_stack: (bsz, K+1, M*2)
-        pin_inp = inp.unsqueeze(1).expand(bsz, self.K+1, edim)  # pin_inp: (bsz, K+1, edim)
-        pin = torch.cat([pin_inp, pin_stack], dim=-1)  # pin: (bsz, N+1, edim + M*2)
+        pin_hid = hid.unsqueeze(1).expand(bsz, self.K+1, self.cdim)  # pin_inp: (bsz, K+1, edim)
+        pin = torch.cat([pin_hid, pin_stack], dim=-1)  # pin: (bsz, N+1, hdim + M*2)
         lp_pop, lp_stay, lp_push = self.policy(pin[:, :-1]).chunk(dim=-1, chunks=3)  # lp_xxx: (bsz, N, 1)
         _, lp_stay_tail, lp_push_tail = self._inf_bias_policy(pin[:, -1:], self.policy[0].weight, self.policy[0].bias)
         # lp_xxx_tail: (bsz, 1, 1)
