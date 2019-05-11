@@ -7,7 +7,10 @@ import json
 
 class EncoderLSTM(nn.Module):
 
-    def __init__(self, idim, cdim, drop):
+    def __init__(self, args):
+        idim = args.idim
+        cdim = args.cdim
+        drop = args.drop
         super(EncoderLSTM, self).__init__()
         self.idim = idim
         self.odim = cdim

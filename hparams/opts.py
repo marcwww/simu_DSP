@@ -1,8 +1,5 @@
 from macros import *
-from . import repeat_lstm, repeat_organics, repeat_ntm, \
-    repeat_sarnn, repeat_alstm, \
-    mirror_ntm, repeat_ntmnos, repeat_ntmr, mirror_ntmr, \
-    mirror_sarnn, mirror_alstm, mirror_sarnnhc
+from hparams import *
 
 
 def general_opts(parser):
@@ -24,42 +21,33 @@ def general_opts(parser):
 
 def select_opt(task, enc_type, parser):
     if task == 'repeat' and enc_type == 'lstm':
-        repeat_lstm.model_opts(parser)
-        repeat_lstm.train_opts(parser)
-    elif task == 'repeat' and enc_type == 'organics':
-        repeat_organics.model_opts(parser)
-        repeat_organics.train_opts(parser)
+        param_file = repeat_lstm
     elif task == 'repeat' and enc_type == 'ntm':
-        repeat_ntm.model_opts(parser)
-        repeat_ntm.train_opts(parser)
-    elif task == 'repeat' and enc_type == 'ntmnos':
-        repeat_ntmnos.model_opts(parser)
-        repeat_ntmnos.train_opts(parser)
-    elif task == 'repeat' and enc_type == 'ntmr':
-        repeat_ntmr.model_opts(parser)
-        repeat_ntmr.train_opts(parser)
+        param_file = repeat_ntm
     elif task == 'repeat' and enc_type == 'sarnn':
-        repeat_sarnn.model_opts(parser)
-        repeat_sarnn.train_opts(parser)
+        param_file = repeat_sarnn
+    elif task == 'repeat' and enc_type == 'sarnnhc':
+        param_file = repeat_sarnnhc
     elif task == 'repeat' and enc_type == 'alstm':
-        repeat_alstm.model_opts(parser)
-        repeat_alstm.train_opts(parser)
-    elif task == 'mirror' and enc_type == 'ntmr':
-        mirror_ntmr.model_opts(parser)
-        mirror_ntmr.train_opts(parser)
+        param_file = repeat_alstm
     elif task == 'mirror' and enc_type == 'ntm':
-        mirror_ntm.model_opts(parser)
-        mirror_ntm.train_opts(parser)
+        param_file = repeat_ntm
     elif task == 'mirror' and enc_type == 'sarnn':
-        mirror_sarnn.model_opts(parser)
-        mirror_sarnn.train_opts(parser)
+        param_file = mirror_sarnn
     elif task == 'mirror' and enc_type == 'sarnnhc':
-        mirror_sarnnhc.model_opts(parser)
-        mirror_sarnnhc.train_opts(parser)
+        param_file = mirror_sarnnhc
     elif task == 'mirror' and enc_type == 'alstm':
-        mirror_alstm.model_opts(parser)
-        mirror_alstm.train_opts(parser)
+        param_file = mirror_alstm
+    elif task == 'm10ae' and enc_type == 'sarnnhc':
+        param_file = m10ae_sarnnhc
+    elif task == 'm10ae' and enc_type == 'ntm':
+        param_file = m10ae_ntm
+    elif task == 'sort' and enc_type == 'ntm':
+        param_file = sort_ntm
+    elif task == 'sort' and enc_type == 'sarnnhc':
+        param_file = sort_sarnnhc
     else:
         raise ModuleNotFoundError
-
+    param_file.model_opts(parser)
+    param_file.train_opts(parser)
     return parser

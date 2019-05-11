@@ -7,6 +7,7 @@ def model_opts(parser):
     group.add_argument('-hdim', type=int, default=100)
     group.add_argument('-odim', type=int, default=9 - 1)
     # group.add_argument('-N', type=int, default=4)
+    group.add_argument('-K', type=int, default=1)
     group.add_argument('-N', type=int, default=20)
     group.add_argument('-M', type=int, default=20)
     group.add_argument('-dropout', type=float, default=0)

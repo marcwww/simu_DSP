@@ -13,76 +13,69 @@ import json
 class EncoderSARNN(MANNBaseEncoder):
     def __init__(self, args):
         idim = args.idim
-        cdim = args.cdim
+        cdim = args.hdim
         N = args.N
         M = args.M
-        drop = args.drop
+        drop = args.dropout
         read_first = args.read_first
         K = args.K
-        super(EncoderSARNN, self).__init__(idim, cdim, N, M, drop, read_first=read_first)
+        assert K <= N
+        super(EncoderSARNN, self).__init__(idim, cdim, N, M, drop,
+                                           read_first=read_first)
 
         self.K = K
-        # self.K = N
         self.mem_bias = nn.Parameter(torch.zeros(M),
                                      requires_grad=False)
-        self.pop_kernel = nn.Parameter(torch.eye(N + 1).
-                                       view(N + 1, 1, N + 1, 1)[:K+1],
-                                       requires_grad=False)
-        self.zero = nn.Parameter(torch.zeros(1, 1, 1),
-                                 requires_grad=False)
-        self.policy = nn.Sequential(nn.Linear(idim + M * 2, 3), nn.LogSoftmax(dim=-1))
-        self.hid2pushed = nn.Linear(cdim, M) if cdim != M else lambda x: x
+        self.update_kernel = nn.Parameter(torch.eye(N + 1).
+                                          view(N + 1, 1, N + 1, 1)[:K+1],
+                                          requires_grad=False)
 
-    def _inf_bias_policy(self, inp, weight, bias):
-        bias = bias.clone()
-        bias[0] = -1e20
-        logits = F.linear(inp, weight, bias)
-        return F.log_softmax(logits, dim=-1).chunk(dim=-1, chunks=3)
+        self.policy_stack = nn.Sequential(nn.Conv1d(M, 2, kernel_size=2),
+                                          nn.Linear(N-1, K+1))
+        # 2 for push and stay
+        # self.policy_input = nn.Linear(idim, 2 * (K + 1))
+        self.policy_input = nn.Linear(cdim, 2 * (K + 1))
+        self.hid2pushed = nn.Linear(cdim, M)
 
-    def update_stack(self, inp, hid):
-        # inp: (bsz, edim)
-        bsz, edim = inp.shape
-        # self.mem: (bsz, N, M)
-        mem_padded = F.pad(self.mem.unsqueeze(1), [0, 0, 0, self.N], 'constant', 0)
-        # mem_padded: (bsz, 1, N + N, M)
+    def policy(self, input):
+        bsz = input.shape[0]
+        mem_padded = self.mem.transpose(1, 2)
+        # mem_padded = F.pad(self.mem.transpose(1, 2),
+        #                    [0, 2], 'constant', 0)
+        policy_stack = self.policy_stack(mem_padded).view(bsz, -1)
+        policy_input = self.policy_input(input)
 
-        # m_pop: (bsz, N+1, N, M)
-        # pop_kernel: (N+1, 1, N + 1, 1)
-        m_pop = F.conv2d(mem_padded, self.pop_kernel)
-        pin_stack = torch.cat([m_pop[:, :, 0], m_pop[:, :, 1]], dim=2)  # pin_stack: (bsz, K+1, M*2)
-        pin_inp = inp.unsqueeze(1).expand(bsz, self.K+1, edim)  # pin_inp: (bsz, K+1, edim)
-        pin = torch.cat([pin_inp, pin_stack], dim=-1)  # pin: (bsz, N+1, edim + M*2)
-        lp_pop, lp_stay, lp_push = self.policy(pin[:, :-1]).chunk(dim=-1, chunks=3)  # lp_xxx: (bsz, N, 1)
-        _, lp_stay_tail, lp_push_tail = self._inf_bias_policy(pin[:, -1:], self.policy[0].weight, self.policy[0].bias)
-        # lp_xxx_tail: (bsz, 1, 1)
-        lp_stay = torch.cat([lp_stay, lp_stay_tail], dim=1)  # to (bsz, N+1, 1)
-        lp_push = torch.cat([lp_push, lp_push_tail], dim=1)  # to (bsz, N+1, 1)
-        lp_pop_revised = torch.cat([self.zero.expand(bsz, 1, 1),
-                                    lp_pop],
-                                   dim=1)  # lp_pop_revised: (bsz, N+1, 1)
-        #  this 'revised' corresponding to the original paper for the base cases
-        lp_pop = lp_pop_revised.cumsum(dim=1)
-        p_stay = (lp_pop + lp_stay).exp().unsqueeze(-1)  # p_stay: (bsz, N+1, 1, 1)
-        p_push = (lp_pop + lp_push).exp().unsqueeze(-1)  # p_push: (bsz, N+1, 1, 1)
+        return F.softmax(policy_stack + policy_input, dim=1)
 
-        # assert ((p_stay + p_push).sum(dim=1).sum() - bsz) < 1e-4
+    def update_stack(self,
+                     p_push, p_stay, hid):
+        bsz = hid.shape[0]
+
+        p_stay = p_stay.unsqueeze(-1).unsqueeze(-1)
+        p_push = p_push.unsqueeze(-1).unsqueeze(-1)
+
+        mem_padded = F.pad(self.mem.unsqueeze(1),
+                           [0, 0, 0, self.N],
+                           'constant', 0)
+
+        # m_stay: (bsz, N+1, N, M)
+        m_stay = F.conv2d(mem_padded, self.update_kernel)
 
         # pushed: (bsz, M)
         pushed = self.hid2pushed(hid)
         # pushed: (bsz, N+1, 1, M)
-        pushed_expanded = pushed.unsqueeze(1).unsqueeze(1).expand(bsz, self.K + 1, 1, self.M)
-        m_push = torch.cat([pushed_expanded, m_pop[:, :, :-1]], dim=2)
-
-        mem_new_stay = (m_pop * p_stay).sum(dim=1)
+        pushed_expanded = pushed.unsqueeze(1).unsqueeze(1).\
+            expand(bsz, self.K + 1, 1, self.M)
+        m_push = torch.cat([pushed_expanded, m_stay[:, :, :-1]], dim=2)
+        mem_new_stay = (m_stay * p_stay).sum(dim=1)
         mem_new_push = (m_push * p_push).sum(dim=1)
 
         # mem_new = (m_stay * p_stay).sum(dim=1) + (m_push * p_push).sum(dim=1)
         mem_new = mem_new_stay + mem_new_push
         self.mem = mem_new
-        return mem_new_stay, mem_new_push, m_pop, m_push, pushed
+        return mem_new_stay, mem_new_push, m_stay, m_push, pushed
 
     def read(self, controller_outp):
-        # r = torch.cat([self.mem[:, 0], self.mem[:, 1]], dim=1)
         r = self.mem[:, 0]
         return r
 
@@ -92,8 +85,11 @@ class EncoderSARNN(MANNBaseEncoder):
         # ctrl_info: (bsz, 3 + nstack * M)
 
         hid = controller_outp
+        # policy = self.policy(input)
+        policy = self.policy(controller_outp)
+        p_push, p_stay = torch.chunk(policy, 2, dim=1)
         mem_stay, mem_push, m_stay, m_push, pushed = \
-            self.update_stack(input, hid)
+            self.update_stack(p_push, p_stay, hid)
 
         if 'analysis_mode' in dir(self) and self.analysis_mode:
             assert 'fsarnn' in dir(self)

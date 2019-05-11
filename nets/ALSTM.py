@@ -9,14 +9,15 @@ from torch.nn.utils.rnn import pack_padded_sequence as pack, \
     pad_packed_sequence as unpack
 import json
 
+
 class EncoderALSTM(MANNBaseEncoder):
-    def __init__(self,
-                 idim,
-                 cdim,
-                 N,
-                 M,
-                 drop,
-                 read_first):
+    def __init__(self, args):
+        idim = args.idim
+        cdim = args.cdim
+        N = args.N
+        M = args.M
+        drop = args.drop
+        read_first = args.read_first
         super(EncoderALSTM, self).__init__(idim, cdim, N, M, drop, read_first=read_first)
         self.atten = utils.Attention(cdim, M)
         self.zero = nn.Parameter(torch.zeros(M), requires_grad=False)
@@ -25,7 +26,7 @@ class EncoderALSTM(MANNBaseEncoder):
         bsz = controller_outp.shape[0]
         a = None
         if len(self.mem) > 1:
-        # mem: (seq_len, bsz, cdim)
+            # mem: (seq_len, bsz, cdim)
             # previous N-1 cells
             # mem = torch.cat(self.mem[:self.N - 1], dim=1)
             mem = torch.cat(self.mem[:len(self.mem) - 1], dim=1)

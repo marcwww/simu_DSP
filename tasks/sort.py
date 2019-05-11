@@ -4,21 +4,21 @@ from torchtext.data import Dataset
 import torch
 from torch import nn
 from torch.nn.utils import clip_grad_norm_
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 import numpy as np
 import utils
 import random
 import os
 from torch.nn import functional as F
 import json
-import tqdm
-import copy
-from sklearn.metrics import accuracy_score, \
-    precision_score, recall_score, f1_score
 import nets
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+import tqdm
 import logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s')
+import copy
+from sklearn.metrics import accuracy_score, \
+    precision_score, recall_score, f1_score
 
 
 def gen_batch(min_len, max_len, bsz, idim):
@@ -26,17 +26,22 @@ def gen_batch(min_len, max_len, bsz, idim):
     max_len = max_len
     bsz = bsz
     assert idim > 2
-    width = idim - 1
+    width = idim - 2
 
     seq_len = random.randint(min_len, max_len)
 
     seq = np.random.binomial(1, 0.5, (seq_len, bsz, width))
     seq = torch.Tensor(seq)
-    inp = torch.zeros(seq_len + 1, bsz, width + 1)
-    inp[:seq_len, :, :width] = seq
-    inp[seq_len, :, width] = 1.0  # delimiter in our control channel
+    order = np.random.uniform(-1, 1, (seq_len, bsz, 1))
+    order = torch.Tensor(order)
+    seq_inp = torch.cat([seq, order], dim=-1)
 
-    outp = seq[range(seq_len - 1, -1, -1)].clone()
+    inp = torch.zeros(seq_len + 1, bsz, width + 2)
+    inp[:seq_len, :, :width + 1] = seq_inp
+    inp[seq_len, :, width + 1] = 1.0  # delimiter in our control channel
+
+    _, indices = torch.sort(order, dim=0)
+    outp = seq.gather(index = indices.expand_as(seq), dim=0)
 
     return inp.float(), outp.float()
 
@@ -68,7 +73,37 @@ def gen_batch_analy(opt):
     inp[:seq_len, :, :width] = seq
     inp[seq_len, :, width] = 1.0  # delimiter in our control channel
 
-    outp = seq[range(seq_len - 1, -1, -1)].clone()
+    outp = seq.clone()
+
+    return inp.float(), outp.float()
+
+
+def gen_batch_pattern(opt):
+    NUMS = list(range(0, 6))
+    seq_len = 4
+    bsz = 1
+    idim = opt.idim
+    width = idim - 1
+
+    seq = []
+    numeral = random.choice(NUMS)
+    pattern = opt.pattern
+    assert len(pattern) == 3
+    pattern = list(map(int, pattern))
+    delta = pattern + [-1]
+
+    for i in range(4):
+        bivec = utils.bin_vec(numeral, width)
+        seq.append(bivec)
+        numeral += delta[i]
+        numeral %= 6
+
+    seq = torch.Tensor(seq).unsqueeze(1)
+    inp = torch.zeros(seq_len + 1, bsz, width + 1)
+    inp[:seq_len, :, :width] = seq
+    inp[seq_len, :, width] = 1.0  # delimiter in our control channel
+
+    outp = seq.clone()
 
     return inp.float(), outp.float()
 
@@ -91,6 +126,9 @@ def log_print(log_path, log_str, optim):
     logging.info(f'{log_str}')
     with open(log_path, 'a+') as f:
         f.write(log_str + '\n')
+
+    # for param_group in optim.param_groups:
+    #     print('learning rate:', param_group['lr'])
 
 
 def analy(**kwargs):
@@ -127,6 +165,27 @@ def analy(**kwargs):
             print(line, file=fanalysis)
 
     return nc / nt
+
+
+def valid_along(**kwargs):
+    model = kwargs['model']
+    diter_valid = kwargs['diter_valid_along']
+
+    nc = 0
+    nt = 0
+
+    with torch.no_grad():
+        model.eval()
+        for inp, tar in diter_valid:
+            tlen, bsz, _ = tar.shape
+            # out: (seq_len, bsz, odim)
+            out = model(inp, tlen)
+            out_binarized = out.data.gt(0.5).float()
+
+            nc += torch.abs(out_binarized - tar).sum(dim=-1).eq(0).sum(dim=1)
+            nt += bsz
+
+    return (nc.float() / nt).cpu().numpy().tolist()
 
 
 def valid(model, valid_iter, args):
@@ -210,7 +269,7 @@ def train(args):
 
                 if acc >= best_perform:
                     best_perform = acc
-                    utils.mdl_save(model, basename, epoch, loss, acc)
+                    utils.mdl_save(model, basename, epoch, loss_ave, acc)
 
 
 class Model(nn.Module):

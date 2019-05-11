@@ -30,10 +30,10 @@ class MANNBaseEncoder(nn.Module):
     def _reset_controller(self):
         for p in self.controller.parameters():
             if p.dim() == 1:
-                nn.init.constant(p, 0)
+                nn.init.constant_(p, 0)
             else:
                 stdev = 5 / (np.sqrt(self.idim + self.M + self.cdim))
-                nn.init.uniform(p, -stdev, stdev)
+                nn.init.uniform_(p, -stdev, stdev)
 
     def reset_read(self, bsz):
         raise NotImplementedError

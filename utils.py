@@ -1,12 +1,15 @@
 import numpy as np
 from torch.nn.init import xavier_uniform_
 from torch.nn.init import kaiming_normal_
+from torch.nn.init import uniform_
+from torch.nn.init import orthogonal_
 import torch
 from torch import nn
 from torch.nn import functional as F
 import logging
 import random
 import time
+from torch import optim
 from torch.autograd import Variable
 from macros import *
 import argparse
@@ -19,8 +22,8 @@ class DataIter(object):
     def __init__(self, opt, nbatch, gen_batch):
         self.nbatch = nbatch
         self.bidx = 0
-        location = opt.device if torch.cuda.is_available() and \
-                                 opt.device != -1 else 'cpu'
+        location = opt.gpu if torch.cuda.is_available() and \
+                                 opt.gpu != -1 else 'cpu'
         self.device = torch.device(location)
         self.gen_batch = gen_batch
         self.opt = opt
@@ -52,7 +55,16 @@ def param_str(opt):
     for attr in dir(opt):
         if attr[0] != '_':
             res_str[attr] = getattr(opt, attr)
+    to_print = '\n'.join([str(key) + ': ' + str(val) for key, val in res_str.items()])
+    logging.info('\n' + to_print)
     return res_str
+
+
+def mdl_save(model, basename, epoch, loss, valid_perf):
+    model_fname = f'{basename}-{epoch}-{loss:.4f}-{valid_perf:.4f}.model'
+    save_path = os.path.join(MDLS, model_fname)
+    logging.info(f'Saving to {save_path}')
+    torch.save(model.state_dict(), save_path)
 
 
 def time_int():
@@ -95,6 +107,19 @@ def parse_opts(description):
     return opt
 
 
+def select_optim(opt, model):
+    if opt.optim == 'rmsprop':
+        optimizer = optim.RMSprop(params=filter(lambda p: p.requires_grad, model.parameters()),
+                                  lr=opt.lr)
+    elif opt.optim == 'adam':
+        optimizer = optim.Adam(params=filter(lambda p: p.requires_grad, model.parameters()),
+                               lr=opt.lr)
+    else:
+        raise ModuleNotFoundError
+
+    return optimizer
+
+
 def init_seed(seed=None):
     def get_ms():
         """Returns the current time in miliseconds."""
@@ -113,11 +138,23 @@ def init_seed(seed=None):
         torch.backends.cudnn.deterministic = True
 
 
-def init_model(model, method):
+def init_model(model, method='xavier'):
+    if method == 'xavier':
+        method = xavier_uniform_
+    elif method == 'uniform':
+        method = uniform_
+    elif method == 'orthogonal':
+        method = orthogonal_
+
     for p in model.parameters():
         if p.dim() > 1 and p.requires_grad:
             method(p)
 
+
+def build_device(args):
+    location = args.gpu if torch.cuda.is_available() and args.gpu != -1 else 'cpu'
+    device = torch.device(location)
+    return device
 
 def model_loading(opt, model):
     model_fname = opt.fload

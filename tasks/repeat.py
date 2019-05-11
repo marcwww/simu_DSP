@@ -4,12 +4,18 @@ from torchtext.data import Dataset
 import torch
 from torch import nn
 from torch.nn.utils import clip_grad_norm_
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 import numpy as np
 import utils
 import random
 import os
 from torch.nn import functional as F
 import json
+import nets
+import tqdm
+import logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(levelname)-8s %(message)s')
 import copy
 from sklearn.metrics import accuracy_score, \
     precision_score, recall_score, f1_score
@@ -106,25 +112,18 @@ def log_init(opt):
     log_path = os.path.join(LOGS, log_fname)
     with open(log_path, 'w') as f:
         f.write(str(utils.param_str(opt)) + '\n')
-
+    logging.info(f'Logging file path: {log_path}')
     return log_path, basename
 
 
 def log_print(log_path, log_str, optim):
     log_str = json.dumps(log_str)
-    print(log_str)
+    logging.info(f'{log_str}')
     with open(log_path, 'a+') as f:
         f.write(log_str + '\n')
 
-    for param_group in optim.param_groups:
-        print('learning rate:', param_group['lr'])
-
-
-def mdl_save(model, basename):
-    model_fname = basename + ".model"
-    save_path = os.path.join(MDLS, model_fname)
-    print('Saving to ' + save_path)
-    torch.save(model.state_dict(), save_path)
+    # for param_group in optim.param_groups:
+    #     print('learning rate:', param_group['lr'])
 
 
 def analy(**kwargs):
@@ -184,20 +183,16 @@ def valid_along(**kwargs):
     return (nc.float() / nt).cpu().numpy().tolist()
 
 
-def valid(**kwargs):
-    model = kwargs['model']
-    diter_valid = kwargs['diter_valid']
-
+def valid(model, valid_iter, args):
     nc = 0
     nt = 0
 
     with torch.no_grad():
         model.eval()
-        for inp, tar in diter_valid:
+        for batch in valid_iter:
+            inp, tar = batch
             tlen, bsz, _ = tar.shape
-            out = model(inp, tlen)
-            out_binarized = out.data.gt(0.5).float()
-
+            out_binarized = run_iter(model, batch, None, None, args, is_training=False)
             cost = torch.abs(out_binarized - tar).sum(dim=0).sum(dim=-1)
             nc += cost.eq(0).sum()
             nt += bsz
@@ -205,66 +200,78 @@ def valid(**kwargs):
     return nc.item() / nt
 
 
-def train(**kwargs):
-    opt = kwargs['opt']
-    model = kwargs['model']
-    diter_train = kwargs['diter_train']
-    diter_valid = kwargs['diter_valid']
-    optim = kwargs['optim']
-    scheduler = kwargs['scheduler']
+def run_iter(model, batch, criterion, optimizer, args, is_training):
+    model.train(is_training)
+    (inp, tar) = batch
+    tlen = tar.shape[0]
+    if is_training:
+        out = model(inp, tlen)
+        loss = criterion(out, tar)
+        optimizer.zero_grad()
+        loss.backward()
+        gnorm = clip_grad_norm_(parameters=model.parameters(), max_norm=args.gclip)
+        optimizer.step()
+        return loss, gnorm
+    else:
+        out = model(inp, tlen)
+        pred = out.data.gt(0.5).float()
+        return pred
+
+
+def train(args):
+    encoder = nets.select_enc(args)
+    model = Model(encoder, args)
+    utils.init_model(model)
+    if args.fload is not None and args.continue_training:
+        utils.model_loading(args, model)
+    train_iter = utils.DataIter(args, args.nbatch_train, gen_batch_train)
+    valid_iter = utils.DataIter(args, args.nbatch_valid, gen_batch_valid)
+    optim = utils.select_optim(args, model)
+    scheduler = ReduceLROnPlateau(optim,
+                                  mode='min',
+                                  factor=0.1,
+                                  patience=args.patience,
+                                  min_lr=args.lr / 10)
 
     criterion = nn.BCELoss()
-    log_path, basename = log_init(opt)
+    log_path, basename = log_init(args)
 
     best_perform = -1
     losses = []
     gnorms = []
-    for epoch in range(opt.nepoch):
-        for i, (inp, tar) in enumerate(diter_train):
-            model.train()
-            model.zero_grad()
-            tlen = tar.shape[0]
-
-            out = model(inp, tlen)
-            loss = criterion(out, tar)
-            losses.append(loss.item())
-
-            loss.backward()
-            gnorm = clip_grad_norm_(model.parameters(), opt.gclip)
+    for epoch in range(args.nepoch):
+        train_iter_tqdm = tqdm.tqdm(train_iter)
+        for i, batch in enumerate(train_iter_tqdm):
+            loss, gnorm = run_iter(model, batch, criterion, optim, args, is_training=True)
+            loss = loss.item()
+            losses.append(loss)
             gnorms.append(gnorm)
-            optim.step()
+            train_iter_tqdm.set_description(f'Epoch {epoch} loss {loss:.4f}')
 
-            loss = {'loss': loss.item()}
-            percent = i / len(diter_train)
-            utils.progress_bar(percent, loss, epoch)
-
-            if (i + 1) % (len(diter_train) // opt.valid_times) == 0:
+            if (i + 1) % (len(train_iter_tqdm) // args.valid_times) == 0:
                 loss_ave = np.mean(losses)
                 gnorm_ave = np.mean(gnorms)
                 losses = []
                 gnorms = []
-                acc = valid(model=model, diter_valid=diter_valid)
+                acc = valid(model, valid_iter, args)
                 log_str = {'Epoch': epoch,
                            'acc': round(acc, 4),
                            'loss': round(float(loss_ave), 4),
                            'gnorm': round(float(gnorm_ave), 4)}
-
-                if opt.min_len_valid == opt.max_len_valid:
-                    acc_along = valid_along(model=model, diter_valid_along=diter_valid)
-                    log_str['acc_along'] = list(map(lambda x: round(float(x), 4), acc_along))
 
                 log_print(log_path, log_str, optim)
                 scheduler.step(loss_ave)
 
                 if acc >= best_perform:
                     best_perform = acc
-                    mdl_save(model, basename)
+                    utils.mdl_save(model, basename, epoch, loss_ave, acc)
 
 
 class Model(nn.Module):
 
-    def __init__(self, encoder, odim):
+    def __init__(self, encoder, args):
         super(Model, self).__init__()
+        odim = args.odim
         self.encoder = encoder
         self.hdim = self.encoder.odim
         self.odim = odim
@@ -273,7 +280,7 @@ class Model(nn.Module):
 
     def forward(self, inp, tlen):
         ilen = inp.shape[0]
-        inp_padded = F.pad(inp, (0, 0, 0, 0, 0, tlen), 'constant', 0)
+        inp_padded = F.pad(inp, [0, 0, 0, 0, 0, tlen], 'constant', 0)
         out = self.encoder(embs=inp_padded, ilen=ilen)
         probs = self.clf(out)
 

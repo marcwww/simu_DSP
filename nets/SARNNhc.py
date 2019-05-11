@@ -13,12 +13,13 @@ import json
 class EncoderSARNNhc(MANNBaseEncoder):
     def __init__(self, args):
         idim = args.idim
-        cdim = args.cdim
+        cdim = args.hdim
         N = args.N
         M = args.M
-        drop = args.drop
+        drop = args.dropout
         read_first = args.read_first
         K = args.K
+        assert K <= N
         super(EncoderSARNNhc, self).__init__(idim, cdim, N, M, drop, read_first=read_first)
 
         # self.K = 1
@@ -34,10 +35,9 @@ class EncoderSARNNhc(MANNBaseEncoder):
         self.policy = nn.Sequential(nn.Linear(cdim + M * 2, 3), nn.LogSoftmax(dim=-1))
         self.hid2pushed = nn.Linear(cdim, M) if cdim != M else lambda x: x
 
-    def _inf_bias_policy(self, inp, weight, bias):
-        bias = bias.clone()
-        bias[0] = -1e20
-        logits = F.linear(inp, weight, bias)
+    def _inf_bias_policy(self, inp):
+        logits = self.policy[0](inp)
+        logits[:, :, 0] = -1e-18
         return F.log_softmax(logits, dim=-1).chunk(dim=-1, chunks=3)
 
     def update_stack(self, inp, hid):
@@ -54,7 +54,7 @@ class EncoderSARNNhc(MANNBaseEncoder):
         pin_hid = hid.unsqueeze(1).expand(bsz, self.K+1, self.cdim)  # pin_inp: (bsz, K+1, edim)
         pin = torch.cat([pin_hid, pin_stack], dim=-1)  # pin: (bsz, N+1, hdim + M*2)
         lp_pop, lp_stay, lp_push = self.policy(pin[:, :-1]).chunk(dim=-1, chunks=3)  # lp_xxx: (bsz, N, 1)
-        _, lp_stay_tail, lp_push_tail = self._inf_bias_policy(pin[:, -1:], self.policy[0].weight, self.policy[0].bias)
+        _, lp_stay_tail, lp_push_tail = self._inf_bias_policy(pin[:, -1:])
         # lp_xxx_tail: (bsz, 1, 1)
         lp_stay = torch.cat([lp_stay, lp_stay_tail], dim=1)  # to (bsz, N+1, 1)
         lp_push = torch.cat([lp_push, lp_push_tail], dim=1)  # to (bsz, N+1, 1)
@@ -66,7 +66,7 @@ class EncoderSARNNhc(MANNBaseEncoder):
         p_stay = (lp_pop + lp_stay).exp().unsqueeze(-1)  # p_stay: (bsz, N+1, 1, 1)
         p_push = (lp_pop + lp_push).exp().unsqueeze(-1)  # p_push: (bsz, N+1, 1, 1)
 
-        # assert ((p_stay + p_push).sum(dim=1).sum() - bsz) < 1e-4
+        assert ((p_stay + p_push).sum(dim=1).sum() - bsz) < 1e-4
 
         # pushed: (bsz, M)
         pushed = self.hid2pushed(hid)

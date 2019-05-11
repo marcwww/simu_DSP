@@ -7,7 +7,7 @@ import utils
 import json
 from torch.nn.utils.rnn import pack_padded_sequence as pack, \
     pad_packed_sequence as unpack
-from .MARNN import MARNNBaseEncoder
+from .MANN import MANNBaseEncoder
 import time
 
 
@@ -72,14 +72,20 @@ class NTMMemory(nn.Module):
         t = time.time()
         k, beta, g, s, gamma = \
             self._preproc(k, beta, g, s, gamma)
-
+        # print('_preproc', time.time() - t)
+        # t = time.time()
         wc = self._similarity(k, beta)
-
+        # print('_similarity', time.time() - t)
+        # t = time.time()
         wg = self._interpolate(w_pre, wc, g)
-
+        # print('_interpolate', time.time() - t)
+        # t = time.time()
         ww = self._shift(wg, s)
-
+        # print('_shift', time.time() - t)
+        # t = time.time()
         w = self._sharpen(ww, gamma)
+        # print('_sharpen', time.time() - t)
+        # exit()
         return w
 
 
@@ -145,9 +151,15 @@ class NTMWriteHead(nn.Module):
         return w
 
 
-class EncoderNTM(MARNNBaseEncoder):
+class EncoderNTM(MANNBaseEncoder):
 
-    def __init__(self, idim, cdim, N, M, drop, read_first):
+    def __init__(self, args):
+        idim = args.idim
+        cdim = args.hdim
+        N = args.N
+        M = args.M
+        drop = args.dropout
+        read_first = args.read_first
         super(EncoderNTM, self).__init__(idim, cdim, N, M, drop, read_first=read_first)
         self.mem = NTMMemory(N, M)
         self.rhead = NTMReadHead(self.mem, cdim)
@@ -169,10 +181,9 @@ class EncoderNTM(MARNNBaseEncoder):
             assert 'fntm' in dir(self)
             assert self.rstate.shape[0] == 1
             line = {'type': 'read',
-                    'w': self.rstate[0].cpu().numpy().tolist(),
-                    'mem': self.mem.memory[0].cpu().numpy().tolist()}
+                    'w': self.rstate[0].cpu().numpy().tolist()}
             line = json.dumps(line)
-            # print(line)
+            print(line)
             print(line, file=self.fntm)
 
         return r
@@ -184,8 +195,7 @@ class EncoderNTM(MARNNBaseEncoder):
             assert 'fntm' in dir(self)
             assert self.rstate.shape[0] == 1
             line = {'type': 'write',
-                    'w': self.wstate[0].cpu().numpy().tolist(),
-                    'mem': self.mem.memory[0].cpu().numpy().tolist()}
+                    'w': self.wstate[0].cpu().numpy().tolist()}
             line = json.dumps(line)
-            # print(line)
+            print(line)
             print(line, file=self.fntm)

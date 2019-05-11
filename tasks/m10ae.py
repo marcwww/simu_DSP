@@ -4,73 +4,31 @@ from torchtext.data import Dataset
 import torch
 from torch import nn
 from torch.nn.utils import clip_grad_norm_
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 import numpy as np
 import utils
 import random
 import os
 from torch.nn import functional as F
 import json
+import nets
 import tqdm
+import logging
+from .m10ae_utils import gen_batch
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(levelname)-8s %(message)s')
 import copy
 from sklearn.metrics import accuracy_score, \
     precision_score, recall_score, f1_score
-import nets
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-import logging
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s %(levelname)-8s %(message)s')
-
-
-def gen_batch(min_len, max_len, bsz, idim):
-    min_len = min_len
-    max_len = max_len
-    bsz = bsz
-    assert idim > 2
-    width = idim - 1
-
-    seq_len = random.randint(min_len, max_len)
-
-    seq = np.random.binomial(1, 0.5, (seq_len, bsz, width))
-    seq = torch.Tensor(seq)
-    inp = torch.zeros(seq_len + 1, bsz, width + 1)
-    inp[:seq_len, :, :width] = seq
-    inp[seq_len, :, width] = 1.0  # delimiter in our control channel
-
-    outp = seq[range(seq_len - 1, -1, -1)].clone()
-
-    return inp.float(), outp.float()
 
 
 def gen_batch_train(opt):
-    return gen_batch(opt.min_len_train, opt.max_len_train, opt.bsz, opt.idim)
+    return gen_batch(opt.min_len_train, opt.max_len_train, opt.min_lopr_train, opt.max_lopr_train, opt.modd, opt.bsz)
 
 
 def gen_batch_valid(opt):
-    return gen_batch(opt.min_len_valid, opt.max_len_valid, opt.bsz, opt.idim)
-
-
-def gen_batch_analy(opt):
-    seq_len = 4
-    bsz = 1
-    idim = opt.idim
-    assert idim > 2
-    width = idim - 1
-
-    NUMS = list(range(1, 9 + 1))
-
-    seq = []
-    for _ in range(seq_len):
-        numeral = random.choice(NUMS)
-        bivec = utils.bin_vec(numeral, width)
-        seq.append(bivec)
-    seq = torch.Tensor(seq).unsqueeze(1)
-    inp = torch.zeros(seq_len + 1, bsz, width + 1)
-    inp[:seq_len, :, :width] = seq
-    inp[seq_len, :, width] = 1.0  # delimiter in our control channel
-
-    outp = seq[range(seq_len - 1, -1, -1)].clone()
-
-    return inp.float(), outp.float()
+    return gen_batch(opt.min_len_valid, opt.max_len_valid, opt.min_lopr_valid, opt.max_lopr_valid, opt.modd, opt.bsz)
 
 
 def log_init(opt):
@@ -92,66 +50,51 @@ def log_print(log_path, log_str, optim):
     with open(log_path, 'a+') as f:
         f.write(log_str + '\n')
 
+    # for param_group in optim.param_groups:
+    #     print('learning rate:', param_group['lr'])
 
-def analy(**kwargs):
+
+def valid_along(**kwargs):
     model = kwargs['model']
-    diter_analy = kwargs['diter_analy']
-    enc_type = kwargs['enc_type']
-    fanalysis = getattr(model.encoder, 'f' + enc_type)
+    diter_valid = kwargs['diter_valid_along']
 
     nc = 0
     nt = 0
 
     with torch.no_grad():
         model.eval()
-        for i, (inp, tar) in enumerate(diter_analy):
+        for inp, tar in diter_valid:
             tlen, bsz, _ = tar.shape
-            assert bsz == 1
+            # out: (seq_len, bsz, odim)
             out = model(inp, tlen)
-            out_binarized = out.data.gt(0.5).float()
-
-            cost = torch.abs(out_binarized - tar).sum(dim=0).sum(dim=-1)
-            nc += cost.eq(0).sum().item()
+            pred = out.max(dim=-1)[1]
+            nc += torch.abs(out_binarized - tar).sum(dim=-1).eq(0).sum(dim=1)
             nt += bsz
 
-            is_correct = 1 if (cost == 0) else 0
-            seq_inp = [str(utils.bivec_tensor2int(num_vec)) for num_vec in inp[:, 0, :-1]]
-            seq_tar = [str(utils.bivec_tensor2int(num_vec)) for num_vec in tar[:, 0]]
-            line = {'type': 'input',
-                    'idx': i,
-                    'inp': seq_inp,
-                    'tar': seq_tar,
-                    'is_correct': is_correct}
-            line = json.dumps(line)
-            print(line)
-            print(line, file=fanalysis)
-
-    return nc / nt
+    return (nc.float() / nt).cpu().numpy().tolist()
 
 
 def valid(model, valid_iter, args):
-    nc = 0
-    nt = 0
+    pred_lst = []
+    tar_lst = []
 
     with torch.no_grad():
         model.eval()
         for batch in valid_iter:
             inp, tar = batch
-            tlen, bsz, _ = tar.shape
-            out_binarized = run_iter(model, batch, None, None, args, is_training=False)
-            cost = torch.abs(out_binarized - tar).sum(dim=0).sum(dim=-1)
-            nc += cost.eq(0).sum()
-            nt += bsz
+            out = run_iter(model, batch, None, None, args, is_training=False)
+            pred = out.max(dim=-1)[1]
+            pred_lst.extend(pred.cpu().numpy())
+            tar_lst.extend(tar.cpu().numpy())
 
-    return nc.item() / nt
+    return accuracy_score(tar_lst, pred_lst)
 
 
 def run_iter(model, batch, criterion, optimizer, args, is_training):
     model.train(is_training)
     (inp, tar) = batch
-    tlen = tar.shape[0]
     if is_training:
-        out = model(inp, tlen)
+        out = model(inp)
         loss = criterion(out, tar)
         optimizer.zero_grad()
         loss.backward()
@@ -159,14 +102,15 @@ def run_iter(model, batch, criterion, optimizer, args, is_training):
         optimizer.step()
         return loss, gnorm
     else:
-        out = model(inp, tlen)
+        out = model(inp)
         pred = out.data.gt(0.5).float()
         return pred
 
 
 def train(args):
     encoder = nets.select_enc(args)
-    model = Model(encoder, args)
+    device = utils.build_device(args)
+    model = Model(encoder, args).to(device)
     utils.init_model(model)
     if args.fload is not None and args.continue_training:
         utils.model_loading(args, model)
@@ -179,7 +123,7 @@ def train(args):
                                   patience=args.patience,
                                   min_lr=args.lr / 10)
 
-    criterion = nn.BCELoss()
+    criterion = nn.CrossEntropyLoss()
     log_path, basename = log_init(args)
 
     best_perform = -1
@@ -210,7 +154,7 @@ def train(args):
 
                 if acc >= best_perform:
                     best_perform = acc
-                    utils.mdl_save(model, basename, epoch, loss, acc)
+                    utils.mdl_save(model, basename, epoch, loss_ave, acc)
 
 
 class Model(nn.Module):
@@ -221,13 +165,11 @@ class Model(nn.Module):
         self.encoder = encoder
         self.hdim = self.encoder.odim
         self.odim = odim
-        self.clf = nn.Sequential(nn.Linear(self.hdim, self.odim),
-                                 nn.Sigmoid())
+        self.clf = nn.Sequential(nn.Linear(self.hdim, self.odim))
 
-    def forward(self, inp, tlen):
-        ilen = inp.shape[0]
-        inp_padded = F.pad(inp, [0, 0, 0, 0, 0, tlen], 'constant', 0)
-        out = self.encoder(embs=inp_padded, ilen=ilen)
-        probs = self.clf(out)
+    def forward(self, inp):
+        out = self.encoder(embs=inp)
+        encoded = out[-1]
+        logtis = self.clf(encoded)
 
-        return probs[ilen:]
+        return logtis
