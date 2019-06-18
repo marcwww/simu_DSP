@@ -22,17 +22,21 @@ from collections import defaultdict
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s')
 
+embeddings = nn.Embedding(6, 6)
+embeddings.weight = nn.Parameter(torch.eye(6), requires_grad=False)
+
+
+def gen_seq(bsz):
+    seq = torch.randint(0, 6, (4, bsz))
+    return embeddings(seq)
+
 
 def gen_batch(min_len, max_len, bsz, idim):
-    min_len = min_len
-    max_len = max_len
-    bsz = bsz
-    assert idim > 2
+    assert idim == 6 + 1
     width = idim - 1
 
-    seq_len = random.randint(min_len, max_len)
-
-    seq = np.random.binomial(1, 0.5, (seq_len, bsz, width))
+    seq_len = 4
+    seq = gen_seq(bsz)
     seq = torch.Tensor(seq)
     inp = torch.zeros(seq_len + 1, bsz, width + 1)
     inp[:seq_len, :, :width] = seq
@@ -259,6 +263,7 @@ class Model(nn.Module):
                                  nn.Sigmoid())
 
     def forward(self, inp, tlen):
+        # inp: (seq_len, bsz, idim=6)
         ilen = inp.shape[0]
         inp_padded = F.pad(inp, [0, 0, 0, 0, 0, tlen], 'constant', 0)
         out = self.encoder(embs=inp_padded, ilen=ilen)

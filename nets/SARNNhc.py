@@ -32,7 +32,7 @@ class EncoderSARNNhc(MANNBaseEncoder):
                                        requires_grad=False)
         self.zero = nn.Parameter(torch.zeros(1, 1, 1),
                                  requires_grad=False)
-        self.policy = nn.Sequential(nn.Linear(cdim + M * 2, 3), nn.LogSoftmax(dim=-1))
+        self.policy = nn.Linear(cdim + M * 2, 3)
         self.hid2pushed = nn.Linear(cdim, M) if cdim != M else lambda x: x
 
     def _inf_bias_policy(self, inp):
@@ -53,20 +53,18 @@ class EncoderSARNNhc(MANNBaseEncoder):
         pin_stack = torch.cat([m_pop[:, :, 0], m_pop[:, :, 1]], dim=2)  # pin_stack: (bsz, K+1, M*2)
         pin_hid = hid.unsqueeze(1).expand(bsz, self.K+1, self.cdim)  # pin_inp: (bsz, K+1, edim)
         pin = torch.cat([pin_hid, pin_stack], dim=-1)  # pin: (bsz, N+1, hdim + M*2)
-        lp_pop, lp_stay, lp_push = self.policy(pin[:, :-1]).chunk(dim=-1, chunks=3)  # lp_xxx: (bsz, N, 1)
-        _, lp_stay_tail, lp_push_tail = self._inf_bias_policy(pin[:, -1:])
-        # lp_xxx_tail: (bsz, 1, 1)
-        lp_stay = torch.cat([lp_stay, lp_stay_tail], dim=1)  # to (bsz, N+1, 1)
-        lp_push = torch.cat([lp_push, lp_push_tail], dim=1)  # to (bsz, N+1, 1)
+        logits = self.policy(pin)
+        logits[:, -1, 0] = -1e18
+        lp_pop, lp_stay, lp_push = F.log_softmax(logits, dim=-1).chunk(dim=-1, chunks=3) # lp_xxx: (bsz, N + 1, 3)
         lp_pop_revised = torch.cat([self.zero.expand(bsz, 1, 1),
-                                    lp_pop],
+                                    lp_pop[:, :-1]],
                                    dim=1)  # lp_pop_revised: (bsz, N+1, 1)
         #  this 'revised' corresponding to the original paper for the base cases
         lp_pop = lp_pop_revised.cumsum(dim=1)
         p_stay = (lp_pop + lp_stay).exp().unsqueeze(-1)  # p_stay: (bsz, N+1, 1, 1)
         p_push = (lp_pop + lp_push).exp().unsqueeze(-1)  # p_push: (bsz, N+1, 1, 1)
 
-        assert ((p_stay + p_push).sum(dim=1).sum() - bsz) < 1e-4
+        assert np.abs((p_stay + p_push).sum(dim=1).sum().item() - bsz) < 1e-4
 
         # pushed: (bsz, M)
         pushed = self.hid2pushed(hid)
@@ -80,7 +78,7 @@ class EncoderSARNNhc(MANNBaseEncoder):
         # mem_new = (m_stay * p_stay).sum(dim=1) + (m_push * p_push).sum(dim=1)
         mem_new = mem_new_stay + mem_new_push
         self.mem = mem_new
-        return mem_new_stay, mem_new_push, m_pop, m_push, pushed
+        return mem_new_stay, mem_new_push, m_pop, m_push, pushed, p_push, p_stay
 
     def read(self, controller_outp):
         # r = torch.cat([self.mem[:, 0], self.mem[:, 1]], dim=1)
@@ -93,20 +91,18 @@ class EncoderSARNNhc(MANNBaseEncoder):
         # ctrl_info: (bsz, 3 + nstack * M)
 
         hid = controller_outp
-        mem_stay, mem_push, m_stay, m_push, pushed = \
+        mem_stay, mem_push, m_stay, m_push, pushed, p_push, p_stay = \
             self.update_stack(input, hid)
 
         if 'analysis_mode' in dir(self) and self.analysis_mode:
-            assert 'fsarnn' in dir(self)
-            assert policy.shape[0] == 1
+            assert 'fsarnnhc' in dir(self)
+            assert p_push.shape[0] == 1 and p_stay.shape[0] == 1
+            p_push = p_push.squeeze()
+            p_stay = p_stay.squeeze()
 
-            val, pos = torch.topk(policy[0], k=1)
-            pos = pos.item()
-            val = val.item()
             line = {'type': 'actions',
-                    'all': policy[0].cpu().numpy().tolist(),
-                    'max_pos': pos,
-                    'max_val': val,
+                    'push': p_push[0].cpu().numpy().tolist(),
+                    'pop': p_stay[0].cpu().numpy().tolist(),
                     'mem': self.mem[0].cpu().numpy().tolist()}
 
             # line['mem_stay'] = mem_stay[0].cpu().numpy().tolist()
@@ -119,16 +115,7 @@ class EncoderSARNNhc(MANNBaseEncoder):
             #     line['mem_stay_%d' % i] = m_stay_i.cpu().numpy().tolist()
 
             line = json.dumps(line)
-            if pos <= 5:
-                # print(line)
-                print(line, file=self.fsarnn)
-                # print('stay after pop %d times with confidence %.3f' % (pos, val))
-                # print('stay after pop %d times with confidence %.3f' % (pos, val), file=self.fanalysis)
-            else:
-                # print(line)
-                print(line, file=self.fsarnn)
-                # print('push after pop %d times with confidence %.3f' % (pos - 6, val))
-                # print('push after pop %d times with confidence %.3f' % (pos-6, val), file=self.fanalysis)
+            print(line, file=self.fsarnnhc)
 
     def reset_read(self, bsz):
         pass

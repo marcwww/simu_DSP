@@ -98,12 +98,12 @@ class MANNBaseEncoder(nn.Module):
                 i, f, g, o, c_new, h_new = _calc_gates(self, controller_inp, h, c)
                 line = {'type': 'gates',
                         't': t,
-                        'i': i.cpu().numpy().tolist(),
-                        'f': f.cpu().numpy().tolist(),
-                        'g': g.cpu().numpy().tolist(),
-                        'o': o.cpu().numpy().tolist()}
+                        'i': utils.round_lst(i.cpu().numpy().tolist()),
+                        'f': utils.round_lst(f.cpu().numpy().tolist()),
+                        'g': utils.round_lst(g.cpu().numpy().tolist()),
+                        'o': utils.round_lst(o.cpu().numpy().tolist())}
                 line = json.dumps(line)
-                print(line)
+                # print(line)
                 print(line, file=self.flstm)
 
             controller_outp, (h, c) = self.controller(controller_inp, (h, c))

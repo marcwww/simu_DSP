@@ -13,12 +13,12 @@ import json
 class EncoderALSTM(MANNBaseEncoder):
     def __init__(self, args):
         idim = args.idim
-        cdim = args.cdim
+        cdim = args.hdim
         N = args.N
         M = args.M
-        drop = args.drop
+        # drop = args.drop
         read_first = args.read_first
-        super(EncoderALSTM, self).__init__(idim, cdim, N, M, drop, read_first=read_first)
+        super(EncoderALSTM, self).__init__(idim, cdim, N, M, 0, read_first=read_first)
         self.atten = utils.Attention(cdim, M)
         self.zero = nn.Parameter(torch.zeros(M), requires_grad=False)
 

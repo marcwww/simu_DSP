@@ -9,6 +9,7 @@ from torch import optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tasks import *
 from torch.nn.init import orthogonal_, uniform_, xavier_uniform_
+import sys
 import crash_on_ipy
 import copy
 
@@ -22,10 +23,6 @@ def select_task(opt):
         return m10ae
     elif opt.task == 'sort':
         return sort
-    elif opt.task == 'repeat_mky':
-        return repeat_mky
-    elif opt.task == 'mirror_mky':
-        return mirror_mky
     else:
         raise ModuleNotFoundError
 
@@ -35,5 +32,7 @@ if __name__ == '__main__':
     opt = utils.parse_opts('main.py')
     utils.init_seed(opt.seed)
     utils.param_str(opt)
+    assert opt.task == 'repeat'
     task = select_task(opt)
-    task.train(opt)
+    acc = task.test(opt)
+    print(acc)

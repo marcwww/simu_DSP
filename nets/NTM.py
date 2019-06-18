@@ -181,9 +181,9 @@ class EncoderNTM(MANNBaseEncoder):
             assert 'fntm' in dir(self)
             assert self.rstate.shape[0] == 1
             line = {'type': 'read',
-                    'w': self.rstate[0].cpu().numpy().tolist()}
+                    'w': utils.round_lst(self.rstate[0].cpu().numpy().tolist())}
             line = json.dumps(line)
-            print(line)
+            # print(line)
             print(line, file=self.fntm)
 
         return r
@@ -195,7 +195,8 @@ class EncoderNTM(MANNBaseEncoder):
             assert 'fntm' in dir(self)
             assert self.rstate.shape[0] == 1
             line = {'type': 'write',
-                    'w': self.wstate[0].cpu().numpy().tolist()}
+                    'w': utils.round_lst(self.wstate[0].cpu().numpy().tolist()),
+                    'mem': utils.round_lst2d(self.mem.memory[0].cpu().numpy().tolist())}
             line = json.dumps(line)
-            print(line)
+            # print(line)
             print(line, file=self.fntm)

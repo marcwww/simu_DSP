@@ -12,7 +12,6 @@ from torch.nn.init import orthogonal_, uniform_, xavier_uniform_
 import sys
 import crash_on_ipy
 import copy
-import numpy as np
 
 
 def select_task(opt):
@@ -64,7 +63,7 @@ if __name__ == '__main__':
 
     opt = utils.parse_opts('main.py')
 
-    assert opt.enc_type == 'ntm'
+    assert opt.enc_type == 'sarnn'
     assert opt.task == 'mirror'
 
     utils.init_seed(opt.seed)
@@ -92,7 +91,7 @@ if __name__ == '__main__':
     fname_dict['flstm'] = flstm
 
     with utils.analy(model.encoder, fname_dict):
-        acc = analy(model=model, diter_analy=diter_analy, enc_type='ntm')
+        acc = analy(model=model, diter_analy=diter_analy, enc_type='sarnn')
 
     print('Accuracy', acc)
     print('Saved to', fname_dict)

@@ -9,14 +9,14 @@ class EncoderLSTM(nn.Module):
 
     def __init__(self, args):
         idim = args.idim
-        cdim = args.cdim
-        drop = args.drop
+        cdim = args.hdim
+        # drop = args.drop
         super(EncoderLSTM, self).__init__()
         self.idim = idim
         self.odim = cdim
         self.cdim = cdim
         self.controller = nn.LSTM(idim, cdim)
-        self.dropout = nn.Dropout(drop)
+        self.dropout = nn.Dropout(0)
         self._reset_controller()
 
         self.h0 = nn.Parameter(torch.randn(cdim) * 0.05, requires_grad=True)

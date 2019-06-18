@@ -14,6 +14,8 @@ import json
 import nets
 import tqdm
 import logging
+from collections import defaultdict
+
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s')
 import copy
@@ -47,6 +49,10 @@ def gen_batch_train(opt):
 
 def gen_batch_valid(opt):
     return gen_batch(opt.min_len_valid, opt.max_len_valid, opt.bsz, opt.idim)
+
+
+def gen_batch_test(opt):
+    return gen_batch(opt.min_len_train, opt.max_len_valid, opt.bsz, opt.idim)
 
 
 def gen_batch_analy(opt):
@@ -137,7 +143,7 @@ def analy(**kwargs):
 
     with torch.no_grad():
         model.eval()
-        for i, (inp, tar) in enumerate(diter_analy):
+        for i, (inp, tar) in enumerate(tqdm.tqdm(diter_analy)):
             tlen, bsz, _ = tar.shape
             assert bsz == 1
             out = model(inp, tlen)
@@ -156,7 +162,7 @@ def analy(**kwargs):
                     'tar': seq_tar,
                     'is_correct': is_correct}
             line = json.dumps(line)
-            print(line)
+            # print(line)
             print(line, file=fanalysis)
 
     return nc / nt
@@ -181,6 +187,34 @@ def valid_along(**kwargs):
             nt += bsz
 
     return (nc.float() / nt).cpu().numpy().tolist()
+
+
+def test(args):
+    encoder = nets.select_enc(args)
+    model = Model(encoder, args)
+    utils.init_model(model)
+    utils.model_loading(args, model, True)
+    test_iter = utils.DataIter(args, args.nbatch_test, gen_batch_test)
+    nc = defaultdict(int)
+    nt = defaultdict(int)
+    acc = defaultdict(float)
+    with torch.no_grad():
+        model.eval()
+        for inp, tar in tqdm.tqdm(test_iter):
+            tlen, bsz, _ = tar.shape
+            # out: (seq_len, bsz, odim)
+            out = model(inp, tlen)
+            out_binarized = out.data.gt(0.5).float()
+
+            corrects = torch.abs(out_binarized - tar).sum(dim=0).sum(dim=-1).eq(0)
+            for b in range(bsz):
+                nc[tlen] += corrects[b].item()
+                nt[tlen] += 1
+
+    for key in nc.keys():
+        acc[key] = nc[key]/nt[key]
+
+    return sorted(acc.items()), sorted(nt.items())
 
 
 def valid(model, valid_iter, args):

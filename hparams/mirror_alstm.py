@@ -17,10 +17,11 @@ def model_opts(parser):
 def train_opts(parser):
     group = parser.add_argument_group('train')
     group.add_argument('-seed', type=int, default=1000)
-    group.add_argument('-nepoch', type=int, default=100)
+    group.add_argument('-nepoch', type=int, default=10)
     group.add_argument('-nbatch_train', type=int, default=10000)
     group.add_argument('-nbatch_valid', type=int, default=100)
-    group.add_argument('-valid_times', type=int, default=4)
+    group.add_argument('-nbatch_test', type=int, default=2000)
+    group.add_argument('-valid_times', type=int, default=10)
     group.add_argument('-fload', type=str, default='mirror-overall-ntm-1545920733.model')
     group.add_argument('-bsz', type=int, default=2)
     group.add_argument('-lr', type=float, default=1e-3)

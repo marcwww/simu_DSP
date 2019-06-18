@@ -23,7 +23,7 @@ class DataIter(object):
         self.nbatch = nbatch
         self.bidx = 0
         location = opt.gpu if torch.cuda.is_available() and \
-                                 opt.gpu != -1 else 'cpu'
+                              opt.gpu != -1 else 'cpu'
         self.device = torch.device(location)
         self.gen_batch = gen_batch
         self.opt = opt
@@ -61,7 +61,7 @@ def param_str(opt):
 
 
 def mdl_save(model, basename, epoch, loss, valid_perf):
-    model_fname = f'{basename}-{epoch}-{loss:.4f}-{valid_perf:.4f}.model'
+    model_fname = f'{basename}-{epoch}-{loss:.4f}-{str(valid_perf)}.model'
     save_path = os.path.join(MDLS, model_fname)
     logging.info(f'Saving to {save_path}')
     torch.save(model.state_dict(), save_path)
@@ -156,10 +156,13 @@ def build_device(args):
     device = torch.device(location)
     return device
 
-def model_loading(opt, model):
+
+def model_loading(opt, model, sub=False):
     model_fname = opt.fload
     location = {'cuda:' + str(opt.gpu): 'cuda:' + str(opt.gpu)} if opt.gpu != -1 else 'cpu'
     model_path = os.path.join(MDLS, model_fname)
+    if sub:
+        model_path = os.path.join('..', model_path)
     model_dict = torch.load(model_path, map_location=location)
     model.load_state_dict(model_dict)
     print('Loaded from ' + model_path)
@@ -204,6 +207,14 @@ def bin_vec(num, dim):
 def bivec_tensor2int(bivec):
     res = int(''.join(list(map(str, list(bivec.int().numpy())))), 2)
     return res
+
+
+def round_lst(lst, n=4):
+    return list(map(lambda x: round(x, n), lst))
+
+
+def round_lst2d(lst, n=4):
+    return [round_lst(row, n) for row in lst]
 
 
 class analy(object):
