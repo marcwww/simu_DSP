@@ -2,42 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0f68e31c-1b70-4afd-81f9-ada336b88d0f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/analysis/mirror_sarnn.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/plan" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hparams/mirror_lstm.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hparams/mirror_mky_lstm.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hparams/mirror_rnn.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hparams/repeat_mky_lstm.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hparams/repeat_rnn.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nets/SimpRNN.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notebooks/lstm.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tasks/mirror_mky.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tasks/repeat_mky.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/mirror.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/repeat.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/error" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/notebooks/lstm_clf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/mirror_ntm.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/mirror_ntm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/repeat_ntm.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/repeat_ntm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hparams/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/hparams/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hparams/mirror_alstm.py" beforeDir="false" afterPath="$PROJECT_DIR$/hparams/mirror_alstm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hparams/mirror_ntm.py" beforeDir="false" afterPath="$PROJECT_DIR$/hparams/mirror_ntm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hparams/mirror_sarnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/hparams/mirror_sarnn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hparams/opts.py" beforeDir="false" afterPath="$PROJECT_DIR$/hparams/opts.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hparams/repeat_alstm.py" beforeDir="false" afterPath="$PROJECT_DIR$/hparams/repeat_alstm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hparams/repeat_lstm.py" beforeDir="false" afterPath="$PROJECT_DIR$/hparams/repeat_lstm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hparams/repeat_ntm.py" beforeDir="false" afterPath="$PROJECT_DIR$/hparams/repeat_ntm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hparams/repeat_sarnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/hparams/repeat_sarnn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nets/ALSTM.py" beforeDir="false" afterPath="$PROJECT_DIR$/nets/ALSTM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nets/LSTM.py" beforeDir="false" afterPath="$PROJECT_DIR$/nets/LSTM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nets/MANN.py" beforeDir="false" afterPath="$PROJECT_DIR$/nets/MANN.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nets/NTM.py" beforeDir="false" afterPath="$PROJECT_DIR$/nets/NTM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nets/SARNNhc.py" beforeDir="false" afterPath="$PROJECT_DIR$/nets/SARNNhc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nets/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/nets/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tasks/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/tasks/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tasks/mirror.py" beforeDir="false" afterPath="$PROJECT_DIR$/tasks/mirror.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tasks/repeat.py" beforeDir="false" afterPath="$PROJECT_DIR$/tasks/repeat.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/plan" beforeDir="false" afterPath="$PROJECT_DIR$/docs/plan" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/lstm.py" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/lstm_bits.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/lstm_repeat_mky.ipynb" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -69,7 +39,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
+            <state relative-caret-position="270">
               <caret line="30" selection-start-line="30" selection-end-line="30" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -80,19 +50,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tasks/__init__.py">
+        <entry file="file://$PROJECT_DIR$/tasks/m10ae.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="65" selection-start-column="65" selection-end-column="65" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/notebooks/lstm.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="625">
-              <caret line="111" column="30" lean-forward="true" selection-start-line="111" selection-start-column="30" selection-end-line="111" selection-end-column="30" />
+            <state relative-caret-position="1485">
+              <caret line="115" column="23" selection-start-line="115" selection-start-column="23" selection-end-line="115" selection-end-column="23" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -101,10 +62,58 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/utils.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2265">
+              <caret line="167" column="38" selection-start-line="167" selection-start-column="38" selection-end-line="167" selection-end-column="38" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+                <marker date="1560692362964" expanded="true" signature="446:447" ph="..." />
+                <marker date="1560692362964" expanded="true" signature="446:452" ph="..." />
+                <marker date="1560692362964" expanded="true" signature="930:976" ph="..." />
+                <marker date="1560692362964" expanded="true" signature="4197:4337" ph="..." />
+                <marker date="1560692362964" expanded="true" signature="5714:5952" ph="..." />
+                <marker date="1560692362964" expanded="true" signature="5825:5952" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/notebooks/lstm_bits.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1245">
+              <caret line="97" column="28" selection-start-line="97" selection-start-column="28" selection-end-line="97" selection-end-column="28" />
+              <folding>
+                <element signature="e#0#16#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/notebooks/lstm_clf.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="173">
+              <caret line="85" column="8" selection-start-line="85" selection-start-column="8" selection-end-line="85" selection-end-column="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/docs/error">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="1" column="75" selection-start-line="1" selection-start-column="75" selection-end-line="1" selection-end-column="75" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nets/LSTM.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="333">
-              <caret line="43" column="27" lean-forward="true" selection-start-line="43" selection-start-column="27" selection-end-line="43" selection-end-column="27" />
+            <state relative-caret-position="585">
+              <caret line="43" column="27" selection-start-line="43" selection-start-column="27" selection-end-line="43" selection-end-column="27" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -115,7 +124,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tasks/repeat_mky.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="512">
+            <state relative-caret-position="4320">
               <caret line="304" column="31" selection-start-line="304" selection-start-column="31" selection-end-line="304" selection-end-column="31" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
@@ -127,8 +136,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/docs/plan">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="33" selection-start-line="3" selection-start-column="33" selection-end-line="3" selection-end-column="33" />
+            <state relative-caret-position="75">
+              <caret line="5" column="51" selection-start-line="5" selection-start-column="51" selection-end-line="5" selection-end-column="51" />
             </state>
           </provider>
         </entry>
@@ -136,8 +145,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tasks/mirror_mky.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="148">
-              <caret line="141" column="32" lean-forward="true" selection-start-line="141" selection-start-column="32" selection-end-line="141" selection-end-column="32" />
+            <state relative-caret-position="1830">
+              <caret line="141" column="32" selection-start-line="141" selection-start-column="32" selection-end-line="141" selection-end-column="32" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -172,8 +181,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/hparams/repeat_ntmr.py" />
-        <option value="$PROJECT_DIR$/test/repeat_pattern_ntmnos.py" />
         <option value="$PROJECT_DIR$/visualization.py" />
         <option value="$PROJECT_DIR$/analysis/repeat_ntmnos.py" />
         <option value="$PROJECT_DIR$/hparams/repeat_ntmnos.py" />
@@ -218,19 +225,20 @@
         <option value="$PROJECT_DIR$/hparams/opts.py" />
         <option value="$PROJECT_DIR$/tasks/__init__.py" />
         <option value="$PROJECT_DIR$/main.py" />
-        <option value="$PROJECT_DIR$/docs/plan" />
         <option value="$PROJECT_DIR$/tasks/repeat_mky.py" />
         <option value="$PROJECT_DIR$/utils.py" />
         <option value="$PROJECT_DIR$/tasks/mirror_mky.py" />
         <option value="$PROJECT_DIR$/notebooks/lstm.py" />
+        <option value="$PROJECT_DIR$/docs/error" />
+        <option value="$PROJECT_DIR$/docs/plan" />
+        <option value="$PROJECT_DIR$/notebooks/lstm_clf.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="960" />
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="23" />
-    <option name="width" value="960" />
-    <option name="height" value="1004" />
+    <option name="width" value="1920" />
+    <option name="height" value="1001" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -248,7 +256,7 @@
             <path>
               <item name="simu_DSP" type="b2602c69:ProjectViewProjectNode" />
               <item name="simu_DSP" type="462c0819:PsiDirectoryNode" />
-              <item name="tasks" type="462c0819:PsiDirectoryNode" />
+              <item name="notebooks" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -261,18 +269,18 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///Users/marc/Documents/work/simu_DSP/tasks/repeat.py" />
     <property name="WebServerToolWindowFactoryState" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/hparams" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/notebooks" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/notebooks" />
       <recent name="$PROJECT_DIR$/hparams" />
       <recent name="$PROJECT_DIR$/tasks" />
       <recent name="$PROJECT_DIR$/nets" />
       <recent name="$PROJECT_DIR$/test" />
-      <recent name="$PROJECT_DIR$/analysis" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -287,7 +295,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.lstm">
+  <component name="RunManager" selected="Python.lstm_clf">
     <configuration name="lstm" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="simu_DSP" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -301,7 +309,29 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/notebooks/lstm.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/notebooks/lstm_bits.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="lstm_clf" type="PythonConfigurationType" factoryName="Python" singleton="false" temporary="true">
+      <module name="simu_DSP" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/miniconda3/envs/ltree/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/notebooks" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/notebooks/lstm_clf.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -347,28 +377,6 @@
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/mirror.py" />
       <option name="PARAMETERS" value="-task mirror -enc_type rnn -fload mirror-overall-rnn-1557888389-16-0.0002-0.0013.model" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="mirror_ntm" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="simu_DSP" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/atec36/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/analysis" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/analysis/mirror_ntm.py" />
-      <option name="PARAMETERS" value="-task mirror -enc_type ntm -fload mirror-overall-ntm-1557679280-95-0.0000-1.0000.model" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -422,19 +430,19 @@
     </configuration>
     <list>
       <item itemvalue="Python.main" />
-      <item itemvalue="Python.mirror_ntm" />
       <item itemvalue="Python.repeat_ntm" />
       <item itemvalue="Python.repeat" />
       <item itemvalue="Python.mirror" />
       <item itemvalue="Python.lstm" />
+      <item itemvalue="Python.lstm_clf" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.lstm_clf" />
         <item itemvalue="Python.lstm" />
         <item itemvalue="Python.mirror" />
         <item itemvalue="Python.repeat" />
         <item itemvalue="Python.repeat_ntm" />
-        <item itemvalue="Python.mirror_ntm" />
       </list>
     </recent_temporary>
   </component>
@@ -450,7 +458,12 @@
       <updated>1545720077963</updated>
       <workItem from="1559048708469" duration="1639000" />
       <workItem from="1560681896531" duration="5449000" />
-      <workItem from="1560700611037" duration="10460000" />
+      <workItem from="1560700611037" duration="22528000" />
+      <workItem from="1561451857052" duration="771000" />
+      <workItem from="1561534969143" duration="636000" />
+      <workItem from="1561991849107" duration="1884000" />
+      <workItem from="1562657851505" duration="3444000" />
+      <workItem from="1563178695159" duration="4730000" />
     </task>
     <task id="LOCAL-00001" summary="ntmr">
       <created>1547018748826</created>
@@ -463,19 +476,18 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="17548000" />
+    <option name="totallyTimeSpent" value="41081000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="960" y="23" width="960" height="1004" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="23" width="1920" height="1001" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49790794" visible="true" weight="0.19607843" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49790794" visible="true" weight="0.2140575" />
       <window_info id="Structure" order="1" sideWeight="0.5014837" side_tool="true" weight="0.18956336" />
       <window_info id="Favorites" order="2" sideWeight="0.50209206" side_tool="true" weight="0.19607843" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32996634" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32894737" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39802632" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.47368422" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -483,14 +495,14 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.32996634" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.24671052" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.2948295" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.32960895" />
       <window_info anchor="bottom" id="File Transfer" order="13" weight="0.3267544" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Remote Host" order="3" />
-      <window_info anchor="right" id="SciView" order="4" weight="0.5486409" />
+      <window_info anchor="right" id="SciView" order="4" weight="0.5479303" />
       <window_info anchor="right" id="Database" order="5" />
     </layout>
     <layout-to-restore>
@@ -538,120 +550,67 @@
   <component name="XDebuggerManager">
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="i.shape" language="Python" />
-        <watch expression="out_linear.shape" language="Python" />
-        <watch expression="w.shape" language="Python" />
-        <watch expression="x.shape" language="Python" />
-        <watch expression="w[None].shape" language="Python" />
-        <watch expression="x[:, :, None].shape" language="Python" />
-        <watch expression="b.shape" language="Python" />
-        <watch expression="x[:, :, None].shape" language="Python" />
-        <watch expression="(w[None].matmul(x[:, :, None])).shape" language="Python" />
-        <watch expression="out.shape" language="Python" />
-        <watch expression="tar.shape" language="Python" />
-        <watch expression="outp.shape" language="Python" />
-        <watch expression="probs.shape" language="Python" />
-        <watch expression="tlen" language="Python" />
+        <watch expression="out" language="Python" />
+        <watch expression="model" language="Python" />
+        <watch expression="model" language="Python" />
       </configuration>
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/simu_DSP$main.coverage" NAME="main Coverage Results" MODIFIED="1560787898491" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/simu_DSP$lstm.coverage" NAME="lstm Coverage Results" MODIFIED="1560788277471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/notebooks" />
+    <SUITE FILE_PATH="coverage/simu_DSP$lstm_clf.coverage" NAME="lstm_clf Coverage Results" MODIFIED="1561451904900" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/notebooks" />
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
       <expression>
-        <expression-string>tlen</expression-string>
+        <expression-string>model</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>probs.shape</expression-string>
+        <expression-string>out</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>outp.shape</expression-string>
+        <expression-string>type(ratio_l)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>tar.shape</expression-string>
+        <expression-string>np.std(ratio_l, axis=0)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>out.shape</expression-string>
+        <expression-string>gate_l_lst</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>(w[None].matmul(x[:, :, None])).shape</expression-string>
+        <expression-string>ratio_r</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>x[:, :, None].shape</expression-string>
+        <expression-string>ratio_l</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>b.shape</expression-string>
+        <expression-string>np.mean(ratio_l, axis=0)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>w[None].shape</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>x.shape</expression-string>
+        <expression-string>ratio_l.shape</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/tasks/m10ae.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1584">
-          <caret line="113" column="27" selection-start-line="113" selection-start-column="27" selection-end-line="113" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#16#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tasks/m10ae_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="143" column="19" selection-start-line="143" selection-start-column="19" selection-end-line="143" selection-end-column="19" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <marker date="1557224686429" expanded="true" signature="597:602" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/analysis/mirror_sarnn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="548">
-          <caret line="75" selection-start-line="75" selection-end-line="75" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/analysis/mirror_ntm.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-455">
-          <caret line="30" column="26" selection-start-line="30" selection-start-column="26" selection-end-line="30" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/repeat_ntm.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-927">
@@ -913,24 +872,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tasks/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="65" selection-start-column="65" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="30" selection-start-line="30" selection-end-line="30" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-            <marker date="1560691530649" expanded="true" signature="340:341" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/hparams/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
@@ -950,13 +891,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/docs/plan">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="33" selection-start-line="3" selection-start-column="33" selection-end-line="3" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/miniconda3/envs/ltree/lib/python3.6/site-packages/torch/nn/functional.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="191">
@@ -964,20 +898,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nets/LSTM.py">
+    <entry file="file://$PROJECT_DIR$/notebooks/lstm_repeat_mky.ipynb" />
+    <entry file="file://$PROJECT_DIR$/tasks/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="43" column="27" lean-forward="true" selection-start-line="43" selection-start-column="27" selection-end-line="43" selection-end-column="27" />
+        <state>
+          <caret column="65" selection-start-column="65" selection-end-column="65" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="30" selection-start-line="30" selection-end-line="30" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
+            <marker date="1560691530649" expanded="true" signature="340:341" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tasks/repeat_mky.py">
+    <entry file="file://$PROJECT_DIR$/tasks/m10ae.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="512">
-          <caret line="304" column="31" selection-start-line="304" selection-start-column="31" selection-end-line="304" selection-end-column="31" />
+        <state relative-caret-position="1485">
+          <caret line="115" column="23" selection-start-line="115" selection-start-column="23" selection-end-line="115" selection-end-column="23" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
           </folding>
@@ -986,8 +929,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-235">
-          <caret line="71" lean-forward="true" selection-start-line="71" selection-end-line="71" />
+        <state relative-caret-position="2265">
+          <caret line="167" column="38" selection-start-line="167" selection-start-column="38" selection-end-line="167" selection-end-column="38" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
             <marker date="1560692362964" expanded="true" signature="446:447" ph="..." />
@@ -1000,23 +943,64 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tasks/mirror_mky.py">
+    <entry file="file://$PROJECT_DIR$/notebooks/lstm_bits.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="141" column="32" lean-forward="true" selection-start-line="141" selection-start-column="32" selection-end-line="141" selection-end-column="32" />
+        <state relative-caret-position="1245">
+          <caret line="97" column="28" selection-start-line="97" selection-start-column="28" selection-end-line="97" selection-end-column="28" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/notebooks/lstm.py">
+    <entry file="file://$PROJECT_DIR$/docs/error">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="625">
-          <caret line="111" column="30" lean-forward="true" selection-start-line="111" selection-start-column="30" selection-end-line="111" selection-end-column="30" />
+        <state relative-caret-position="15">
+          <caret line="1" column="75" selection-start-line="1" selection-start-column="75" selection-end-line="1" selection-end-column="75" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nets/LSTM.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="585">
+          <caret line="43" column="27" selection-start-line="43" selection-start-column="27" selection-end-line="43" selection-end-column="27" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tasks/repeat_mky.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4320">
+          <caret line="304" column="31" selection-start-line="304" selection-start-column="31" selection-end-line="304" selection-end-column="31" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/docs/plan">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="51" selection-start-line="5" selection-start-column="51" selection-end-line="5" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tasks/mirror_mky.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1830">
+          <caret line="141" column="32" selection-start-line="141" selection-start-column="32" selection-end-line="141" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/notebooks/lstm_clf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="173">
+          <caret line="85" column="8" selection-start-line="85" selection-start-column="8" selection-end-line="85" selection-end-column="8" />
         </state>
       </provider>
     </entry>

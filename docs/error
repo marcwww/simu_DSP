@@ -1,0 +1,2 @@
+1. pytorch do not retain temp grad for intermediate nodes, should use 'retain_grad()'
+2. notice hs.grad might be different from torch.stack([h.grad for h in hs])
